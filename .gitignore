@@ -8,3 +8,8 @@ __pycache__/
 # OS/editor cruft
 .DS_Store
 .ipynb_checkpoints/
+
+# large source/derived data artifacts -- too big for GitHub's 100MB limit
+# and for the free LFS storage quota; kept on disk, not versioned
+dialogueText_196.csv
+df_with_sentiment.pkl
