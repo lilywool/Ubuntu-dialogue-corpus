@@ -1,0 +1,10 @@
+# byte-compiled / cache
+__pycache__/
+*.pyc
+
+# large data artifacts tracked via Git LFS instead
+# (see .gitattributes -- these patterns stay in git as pointer files)
+
+# OS/editor cruft
+.DS_Store
+.ipynb_checkpoints/
