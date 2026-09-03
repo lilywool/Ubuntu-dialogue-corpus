@@ -1,0 +1,1 @@
+These notebooks are legacy: they were exploratory work done pre-pipeline, before the processing steps were consolidated into standalone .py modules and chained into a single run_pipeline.py script. They're kept here for reference and reproducibility of that exploratory process, not as the current way to run the corpus processing.
