@@ -66,13 +66,24 @@ never shared with the Ubuntu `master` clone or the Yelp repo.
 - [x] Sampler arms set: **`text_cleaned` primary** (matches the committed
       `analyze_sentiment(..., text_column='text_cleaned')` default,
       verified at sentiment_analysis.py:214), raw `text` as comparison.
-- [!] **Competing hypothesis for the collapse, testable on CPU now:**
-      `strip_label_tokens_series` removes NONWORD/language/script
-      placeholders before scoring. fp16 has thousands of representable
-      values in [-1,1], so precision loss alone does not plausibly yield
-      **8** unique scores across 8.59M rows -- degenerate post-strip inputs
-      or an assignment bug fit that number far better. See
-      docs_schema_df_with_sentiment.md.
+- [x] **CPU preprocessing diagnostic built**
+      (`scripts/diagnose_preprocessing.py`, fixture extended to 25 rows
+      with a synthetic `text_cleaned` column). Three arms -- raw
+      unstripped, cleaned unstripped, cleaned+stripped (the real pipeline
+      path) -- at batch sizes 1 and 32, recording original and effective
+      input, effective-emptiness, unique effective inputs, label, and
+      full-precision score with **no rounding before any uniqueness
+      check**, plus VADER. Labelled a preprocessing diagnostic and
+      float32 baseline, NOT a collapse reproduction.
+- [!] **Correction:** an earlier claim here -- that fp16 could not explain
+      8 unique scores because fp16 has thousands of representable values
+      -- was incomplete and is withdrawn. It addressed rounding only.
+      fp16 overflow in attention -> inf/NaN logits -> saturated softmax
+      does fit a handful of repeated confidences, so fp16 remains a
+      leading hypothesis. Also noted: transformer_score is label
+      confidence, not a signed compound; and empty rows are filtered
+      before inference, so stripping reduces input diversity but cannot
+      itself manufacture repeated model scores.
 - [ ] **Step 2 (extraction) NOT authorized yet** and additionally blocked
       on RAM. Needs ~8-10 GiB free.
 - [ ] GPU presence still unconfirmed (not "no GPU").

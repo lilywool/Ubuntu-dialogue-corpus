@@ -18,8 +18,15 @@
 pandas==3.0.1
 pyarrow==19.0.0
 
-# UNVERIFIED: numpy is left to pip's resolver for now. The pickle stream
-# references numpy._core.numeric._frombuffer, i.e. it was written by
-# numpy 2.x, but the writer's exact numpy version has not been checked.
-# If deserialization raises a numpy-specific error, pin this to match --
-# `conda list numpy` in the base env is a read-only query that answers it.
+# numpy pinned to the writer's IMPORTED runtime version, not its package
+# metadata. The read-only check on 2026-09-04 returned conflicting values:
+#     conda list      -> numpy 2.4.2
+#     imported version-> numpy 2.4.6
+# The environment that actually wrote the pickle behaves as 2.4.6, so that
+# is what is pinned; the conda metadata is stale or was shadowed by a
+# pip-installed upgrade. Consistent with the pickle stream, which
+# references numpy._core.numeric._frombuffer (a numpy 2.x path).
+#
+# If deserialization raises a numpy-specific error despite this pin, the
+# metadata/runtime split is the first thing to re-check.
+numpy==2.4.6

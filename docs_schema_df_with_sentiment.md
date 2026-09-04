@@ -104,24 +104,36 @@ Unverified until a successful deserialization:
 These need the real load (step 2), with adequate RAM and the extraction
 environment.
 
-## Open hypothesis for the collapse, independent of fp16
+## Collapse hypotheses -- fp16 remains a prime suspect
 
-`analyze_sentiment(df, text_column='text_cleaned')` calls
-`strip_label_tokens_series` (sentiment_analysis.py:219) before scoring,
-removing every `KNOWN_LABEL_TOKENS` placeholder -- `NONWORD`, the
-`LANGUAGE_LABELS` values, and the non-Latin script labels. The module also
-carries `is_effectively_empty` for rows with no alphabetic content left
-afterwards.
+An earlier note here argued that fp16 could not explain **8** unique scores
+across 8.59M rows, on the grounds that fp16 has thousands of representable
+values across [-1, 1]. **That argument was incomplete and is withdrawn.**
+It addressed only rounding granularity. fp16's more likely failure mode
+here is numerical instability, not rounding: overflow in attention
+producing `inf`/`NaN` logits, and a softmax that saturates to ~1.0. That
+mode does yield a handful of repeated confidence values, which fits the
+reported figure well. fp16 therefore stays a leading hypothesis, and the
+CPU work cannot speak to it either way -- `get_transformer_pipeline` sets
+`torch_dtype = float16 if device != -1 else float32`, so CPU is always the
+float32 arm.
 
-If a large share of `text_cleaned` is placeholder tokens, stripping leaves
-many rows empty or near-identical, and the model would score them
-identically -- collapsing unique-score count without any dtype involvement.
+Two further facts shape what is testable:
 
-This deserves testing BEFORE fp16, on an arithmetic argument: fp16 has
-thousands of distinct representable values across [-1, 1], so fp16 rounding
-alone would not plausibly reduce 8.59M rows to **8** unique scores. A count
-that small points much more strongly at a tiny number of distinct effective
-inputs (or at an assignment/aggregation bug) than at precision loss. The
-diagnostic fixture's empty and label-only rows target exactly this, and it
-is testable on CPU today -- unlike the fp16 arm, which stays blocked on
-CUDA-capable execution.
+1. `transformer_score` is the model's **confidence in its predicted
+   label**, not a signed compound like VADER's. Confidences cluster high
+   by nature, so a low unique-count is less surprising for this column
+   than it would be for a compound score -- worth keeping in mind before
+   treating any particular count as anomalous.
+
+2. `score_transformer_series` filters with `is_effectively_empty` **before
+   inference** (sentiment_analysis.py:169). Empty rows get
+   `transformer_label=None` / `transformer_score=NaN` without reaching the
+   model. So placeholder stripping can reduce the *diversity of inputs*,
+   but repeated empty inputs cannot themselves produce repeated model
+   scores. Stripping is a contributing factor to investigate, not a
+   competing explanation for the score count.
+
+The CPU diagnostic (`scripts/diagnose_preprocessing.py`) is therefore
+scoped as a **preprocessing diagnostic and float32 baseline**, explicitly
+not a reproduction of the historical collapse.
