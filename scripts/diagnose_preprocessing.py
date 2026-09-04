@@ -49,6 +49,15 @@ PER_ROW_OUT = "data/diagnostic_results_per_row.csv"
 SUMMARY_OUT = "data/diagnostic_results_summary.csv"
 BATCH_SIZES = [1, 32]
 
+# Batch-parity tolerance. Exact float equality is the WRONG test here and
+# was the original mistake in this script: batching changes accumulation
+# order, so bit-identical results are not expected even on a healthy run.
+# Measured on the 2026-09-04 float32 CPU run: max |delta| ~5.36e-7, mean
+# ~1.5e-7 to 1.8e-7 -- ordinary floating-point accumulation noise. Labels,
+# by contrast, must match exactly: a label flip is a real behavioral
+# difference, not noise.
+SCORE_TOLERANCE = 1e-6
+
 
 def report_runtime():
     import torch
@@ -145,20 +154,40 @@ def main():
     with pd.option_context("display.width", 200, "display.max_columns", None):
         print(summary_df.to_string(index=False))
 
-    # Batch-size sensitivity: exact float comparison, per arm.
-    print("\n=== batch-size sensitivity (exact float equality) ===")
+    # Batch-size sensitivity. Scores compared within SCORE_TOLERANCE
+    # (accumulation order differs between batch sizes); labels compared
+    # exactly, since a flip is behavioral rather than numerical.
+    print(f"\n=== batch-size sensitivity "
+          f"(scores within {SCORE_TOLERANCE:g}, labels exact) ===")
     for arm_name in arms:
-        a = per_row_df[(per_row_df.arm == arm_name) & (per_row_df.batch_size == BATCH_SIZES[0])]
-        b = per_row_df[(per_row_df.arm == arm_name) & (per_row_df.batch_size == BATCH_SIZES[1])]
-        a = a.set_index("row_id")["transformer_score"]
-        b = b.set_index("row_id")["transformer_score"]
-        both_nan = a.isna() & b.isna()
-        identical = ((a == b) | both_nan).all()
-        n_diff = int((~((a == b) | both_nan)).sum())
-        print(f"  {arm_name:<20} identical={identical}  differing_rows={n_diff}")
-        if n_diff:
-            diff = pd.DataFrame({"bs%d" % BATCH_SIZES[0]: a, "bs%d" % BATCH_SIZES[1]: b})
-            print(diff[~((a == b) | both_nan)].to_string())
+        a = per_row_df[(per_row_df.arm == arm_name) & (per_row_df.batch_size == BATCH_SIZES[0])].set_index("row_id")
+        b = per_row_df[(per_row_df.arm == arm_name) & (per_row_df.batch_size == BATCH_SIZES[1])].set_index("row_id")
+
+        sa, sb = a["transformer_score"], b["transformer_score"]
+        both_nan = sa.isna() & sb.isna()
+        delta = (sa - sb).abs()
+        score_ok = (delta <= SCORE_TOLERANCE) | both_nan
+
+        la, lb = a["transformer_label"], b["transformer_label"]
+        label_ok = (la == lb) | (la.isna() & lb.isna())
+
+        max_delta = delta[~both_nan].max() if (~both_nan).any() else 0.0
+        mean_delta = delta[~both_nan].mean() if (~both_nan).any() else 0.0
+        n_score_fail = int((~score_ok).sum())
+        n_label_fail = int((~label_ok).sum())
+
+        verdict = "PASS" if (n_score_fail == 0 and n_label_fail == 0) else "FAIL"
+        print(f"  {arm_name:<20} {verdict}  max_delta={max_delta:.3e}  "
+              f"mean_delta={mean_delta:.3e}  score_fails={n_score_fail}  "
+              f"label_fails={n_label_fail}")
+
+        if n_label_fail:
+            print("    label changes (always significant):")
+            print(pd.DataFrame({"bs%d" % BATCH_SIZES[0]: la, "bs%d" % BATCH_SIZES[1]: lb})[~label_ok].to_string())
+        if n_score_fail:
+            print(f"    score deltas exceeding {SCORE_TOLERANCE:g}:")
+            print(pd.DataFrame({"bs%d" % BATCH_SIZES[0]: sa, "bs%d" % BATCH_SIZES[1]: sb,
+                                "delta": delta})[~score_ok].to_string())
 
     print(f"\nWrote {PER_ROW_OUT} and {SUMMARY_OUT}")
     print("\nReminder: float32 CPU preprocessing diagnostic. It does not, and")

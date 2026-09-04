@@ -84,8 +84,20 @@ never shared with the Ubuntu `master` clone or the Yelp repo.
       confidence, not a signed compound; and empty rows are filtered
       before inference, so stripping reduces input diversity but cannot
       itself manufacture repeated model scores.
+- [x] **CPU diagnostic RUN 2026-09-04** -- see
+      `docs_diagnostic_run_2026-09-04.md`. Preprocessing and batch size
+      are both ruled out as collapse mechanisms on the synthetic fixture:
+      every input reaching the model produced a distinct confidence in all
+      three arms (22/22, 23/23, 18/18), all three labels present, zero
+      label changes across batch sizes, max delta ~5.36e-7. fp16 remains
+      the standing hypothesis and is untestable without CUDA.
+- [x] **Batch-parity test corrected**: exact float equality replaced with
+      a 1e-6 score tolerance plus exact label matching. The original test
+      would have failed a healthy run on ordinary accumulation noise.
+      Carry this standard into Databricks parity checks too.
 - [ ] **Step 2 (extraction) NOT authorized yet** and additionally blocked
-      on RAM. Needs ~8-10 GiB free.
+      on RAM. Needs ~8-10 GiB free. This is now the critical path: the
+      cheap CPU-testable hypotheses are exhausted.
 - [ ] GPU presence still unconfirmed (not "no GPU").
 - [ ] No dtype/CUDA-related code changes made yet to `sentiment_analysis.py`
       in this branch -- unmodified copy, carried over via the clone.
