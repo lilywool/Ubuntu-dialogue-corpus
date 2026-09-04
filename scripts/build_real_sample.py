@@ -10,8 +10,13 @@ Per project isolation rules, this script must not run until explicitly
 authorized, and the source path below is intentionally left unset so it
 can't be run by accident.
 
-Usage (after authorization + confirming column names, see CONFIG below):
-    ..\.venv\python.exe scripts\build_real_sample.py
+Runs in the EXTRACTION environment (.venv-extract, pandas 3.0.1 +
+pyarrow 19.0.0 -- matching the pickle's writer), NOT the transformer
+runtime. Emits CSV so the transformer env can read the fixture with
+plain pandas 2.2.3 and needs neither pyarrow nor pandas 3.x.
+
+Usage (only under the step-2 extraction authorization):
+    .\.venv-extract\python.exe scripts\build_real_sample.py
 """
 import sys
 import numpy as np
@@ -30,10 +35,14 @@ N_LENGTH_BANDS = 5
 # data exposure. message_id is the stable per-row id.
 ID_COLS = ["message_id", "conversation_id"]
 
-# Both text variants are carried: which one was fed to the transformer
-# during the historical run is not recorded anywhere, and it materially
-# changes the diagnosis, so the reproduction must be runnable either way.
-TEXT_COLS = ["text", "text_cleaned"]
+# Both text variants are carried. text_cleaned is the PRIMARY arm: the
+# committed entry point is analyze_sentiment(df, text_column='text_cleaned')
+# (sentiment_analysis.py:214), so that is the path the historical run took.
+# Raw text is the COMPARISON arm -- if the two diverge sharply, that is a
+# preprocessing finding rather than a dtype one.
+PRIMARY_TEXT_COL = "text_cleaned"
+COMPARISON_TEXT_COL = "text"
+TEXT_COLS = [PRIMARY_TEXT_COL, COMPARISON_TEXT_COL]
 
 # Prefer the corpus's own pre-computed band column; fall back to quantile
 # banding on the raw length if it is absent.
@@ -70,7 +79,7 @@ def main():
     work = df[keep].copy()
     del df  # release the 2.9GB source as early as possible
 
-    primary_text = text_cols[0]
+    primary_text = PRIMARY_TEXT_COL if PRIMARY_TEXT_COL in text_cols else text_cols[0]
     work = work.dropna(subset=[primary_text])
 
     # Stratify on the corpus's own band column when present, else derive
@@ -106,6 +115,7 @@ def main():
     sort_key = id_cols[0] if id_cols else primary_text
     sample = sample.sort_values(sort_key).reset_index(drop=True)
 
+    # CSV, not parquet: keeps the transformer runtime free of pyarrow.
     sample.to_csv(OUTPUT_PATH, index=False)
     print(f"Wrote {len(sample):,} rows to {OUTPUT_PATH}")
     print(f"Columns: {list(sample.columns)}")

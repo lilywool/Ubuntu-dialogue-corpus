@@ -17,4 +17,5 @@ df_with_sentiment.pkl
 # transformer-branch local environment -- repo-local conda-prefix env,
 # never committed (isolation rules: env stays local to this clone)
 .venv/
+.venv-extract/
 requirements.lock.txt.tmp

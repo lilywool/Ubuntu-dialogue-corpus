@@ -1,36 +1,29 @@
-# Pinned dependencies for the isolated transformer-sentiment work (transformer branch).
+# Model-runtime pins for the isolated transformer-sentiment work.
 #
-# GPU status (as of 2026-09-04): unconfirmed, not "no GPU". What's actually
-# established is narrower: `nvidia-smi` is unavailable in the environments
-# checked, and the existing Anaconda install's torch (2.13.0) is a CPU-only
-# build reporting torch.cuda.is_available() == False. That does not rule out
-# a GPU being present but undetected/unconfigured for Python.
+# Scope: this environment SCORES a small CSV fixture. It deliberately does
+# NOT carry pandas 3.0.1 / pyarrow, and does NOT deserialize the source
+# pickle. Source-deserialization compatibility is a separate concern with
+# its own environment -- see requirements-extract.txt. Keeping them apart
+# means the model runtime never inherits pins it only needs to read a
+# 2,000-row CSV.
+#
+# GPU status (as of 2026-09-04): unconfirmed, not "no GPU". Established:
+# nvidia-smi is unavailable in the environments checked, and the base
+# Anaconda torch build is CPU-only with torch.cuda.is_available() == False.
+# That does not rule out undetected/unconfigured hardware.
 #
 # PyPI is the primary index; the PyTorch CPU wheel repo is an *extra* index
 # (not a global override), so pandas/transformers/etc. still resolve from
-# PyPI normally. torch itself is pinned to the explicit +cpu local build tag
-# so it can never silently resolve a CUDA wheel regardless of which index
-# serves it. Switching to a CUDA build requires explicit approval, and
-# should only happen after GPU presence is actually confirmed on native
-# Windows (e.g. Get-CimInstance Win32_VideoController), not just absence of
-# nvidia-smi.
+# PyPI normally. torch is pinned to the explicit +cpu local build tag so it
+# can never silently resolve a CUDA wheel. Switching to a CUDA build needs
+# explicit approval AND confirmed GPU presence.
 --index-url https://pypi.org/simple
 --extra-index-url https://download.pytorch.org/whl/cpu
 
 pandas==2.2.3
-# Required to read df_with_sentiment.pkl: its string columns (and its
-# columns index) are pyarrow-backed ArrowStringArray/large_string. Without
-# this, pd.read_pickle fails with ModuleNotFoundError before any memory
-# issue is even reached. If unpickling raises an Arrow-specific error,
-# repin to match the pyarrow version that WROTE the file (check the base
-# Anaconda env: `conda list pyarrow` -- read-only, changes nothing).
-pyarrow==18.1.0
 vaderSentiment==3.3.2
 torch==2.5.1+cpu
 transformers==4.46.3
 tqdm==4.67.1
 
-# TODO: once the .venv (conda prefix env) is built with Python 3.11,
-# generate a full platform-specific lock (`python -m pip freeze` or
-# `conda list --explicit`) and commit it as requirements.lock.txt -- this
-# file pins direct deps only, not the full resolved/transitive graph.
+# Lock: regenerate requirements.lock.txt after any change here.

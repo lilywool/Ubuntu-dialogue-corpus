@@ -1,4 +1,12 @@
-# Schema: df_with_sentiment.pkl (source corpus artifact)
+# Schema: df_with_sentiment.pkl (source corpus artifact) -- PARTIAL
+
+**Status: partial, not a completed schema inspection.** What follows was
+recovered from the raw byte/opcode stream, which yields column *names* and
+structural class names and nothing more. Dtypes, exact row count, index
+metadata, null behavior, and actual row contents remain **unverified** and
+stay that way until a successful deserialization. Do not treat this as a
+substitute for that step; treat it as enough to configure the sampler
+correctly in advance.
 
 Established 2026-09-04 **without deserializing the file**, via
 `scripts/peek_pickle_schema.py` (opcode/byte-stream inspection, read-only,
@@ -61,19 +69,59 @@ Claude's Linux-VM bridge has ~3.5 GiB and no swap -- neither is safe for a
    anywhere. The sampler carries both so the reproduction can be run each
    way.
 
-4. **pyarrow is a hard dependency for loading this file** and was missing
-   from `requirements.txt`/`requirements.lock.txt` -- `pd.read_pickle`
-   would have failed with `ModuleNotFoundError: pyarrow` even with enough
-   RAM. Now pinned. If unpickling raises an Arrow-specific error rather
-   than a memory error, the pin likely needs to match the pyarrow version
-   that *wrote* the file (check the base Anaconda env with
-   `conda list pyarrow` -- a read-only query, no changes).
+4. **pyarrow is a hard dependency for loading this file**, and neither
+   pyarrow nor a writer-compatible pandas was present anywhere --
+   `pd.read_pickle` would have failed with `ModuleNotFoundError: pyarrow`
+   even with unlimited RAM. The memory wall was masking a second blocker.
+
+   Resolved by splitting environments rather than by widening the model
+   runtime's pins. The writer's environment was confirmed read-only as
+   **pandas 3.0.1 / pyarrow 19.0.0**, and pandas pickle compatibility
+   across major versions is not a reliable archival contract, so:
+   - `requirements-extract.txt` (-> `.venv-extract`) matches the writer and
+     is used only to load the pickle once and emit the CSV fixture.
+   - `requirements.txt` (-> `.venv`) stays a pure model runtime on
+     pandas 2.2.3 with no pyarrow, since it only ever reads a 2,000-row CSV.
+   The earlier guessed `pyarrow==18.1.0` pin has been dropped entirely.
 
 5. Pre-computed banding columns already exist (`word_count_bucket`,
    `text_length_bucket`), so the sampler stratifies on the corpus's own
    bands when available instead of re-deriving quantiles.
 
-## Still unknown without a full load
+## Still unknown without a full load -- schema inspection NOT complete
 
-Per-column dtypes, exact row count, null counts, and the actual value
-distributions. Those need the real load, i.e. step 2, with adequate RAM.
+Unverified until a successful deserialization:
+
+- per-column dtypes (the pyarrow backing is inferred from class names in
+  the stream, not from a dtype listing)
+- exact row count (~8.59M is inferred from a ~68.7 MB int64 index buffer,
+  not read from the frame)
+- index metadata: type, name, monotonicity, whether it aligns with
+  `message_id`
+- null counts and null behavior per column
+- any actual row contents, and therefore all value distributions
+
+These need the real load (step 2), with adequate RAM and the extraction
+environment.
+
+## Open hypothesis for the collapse, independent of fp16
+
+`analyze_sentiment(df, text_column='text_cleaned')` calls
+`strip_label_tokens_series` (sentiment_analysis.py:219) before scoring,
+removing every `KNOWN_LABEL_TOKENS` placeholder -- `NONWORD`, the
+`LANGUAGE_LABELS` values, and the non-Latin script labels. The module also
+carries `is_effectively_empty` for rows with no alphabetic content left
+afterwards.
+
+If a large share of `text_cleaned` is placeholder tokens, stripping leaves
+many rows empty or near-identical, and the model would score them
+identically -- collapsing unique-score count without any dtype involvement.
+
+This deserves testing BEFORE fp16, on an arithmetic argument: fp16 has
+thousands of distinct representable values across [-1, 1], so fp16 rounding
+alone would not plausibly reduce 8.59M rows to **8** unique scores. A count
+that small points much more strongly at a tiny number of distinct effective
+inputs (or at an assignment/aggregation bug) than at precision loss. The
+diagnostic fixture's empty and label-only rows target exactly this, and it
+is testable on CPU today -- unlike the fp16 arm, which stays blocked on
+CUDA-capable execution.

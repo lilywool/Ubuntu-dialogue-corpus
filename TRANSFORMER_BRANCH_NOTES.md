@@ -36,8 +36,11 @@ never shared with the Ubuntu `master` clone or the Yelp repo.
       environment is **partially installed** -- do not trust or generate
       `requirements.lock.txt` (a `pip freeze`) until install completes
       cleanly.
-- [x] **Step 1 (schema inspection) COMPLETE** -- but not by loading the
-      pickle. Both machines lacked the RAM (native Windows: 0.54 GiB of
+- [~] **Step 1 (schema inspection) PARTIAL -- not complete.** Column
+      names and structure were recovered without loading the pickle, but
+      dtypes, exact shape, index metadata, null behavior and row contents
+      remain unverified until a successful deserialization. Do not mark
+      this phase done. Both machines lacked the RAM (native Windows: 0.54 GiB of
       15.3 GiB available; Claude's bridge VM: ~3.5 GiB, no swap). Schema
       was instead recovered from the pickle byte/opcode stream without
       deserializing anything -- see `docs_schema_df_with_sentiment.md` for
@@ -48,11 +51,28 @@ never shared with the Ubuntu `master` clone or the Yelp repo.
       schema: `message_id` as the stable id, **no `from`/`to` usernames**,
       both `text` and `text_cleaned` carried, stratification on the
       corpus's own `word_count_bucket`.
-- [x] `pyarrow==18.1.0` added to requirements.txt -- the source's string
-      columns are pyarrow-backed, so `pd.read_pickle` would have failed
-      with ModuleNotFoundError regardless of available memory.
-      **`requirements.lock.txt` is now stale** -- re-run the install and
-      re-freeze before step 2.
+- [x] **Two-environment split** instead of widening the runtime's pins.
+      Writer env confirmed read-only as pandas 3.0.1 / pyarrow 19.0.0;
+      cross-major-version pandas pickle compat is not a reliable archival
+      contract, so:
+        * `requirements-extract.txt` -> `.venv-extract` (pandas==3.0.1,
+          pyarrow==19.0.0) loads the pickle once and emits the CSV fixture.
+        * `requirements.txt` -> `.venv` stays a pure model runtime
+          (pandas 2.2.3, no pyarrow) -- it only reads a 2,000-row CSV.
+      The guessed `pyarrow==18.1.0` pin is dropped. `requirements.txt` is
+      unchanged in substance for the runtime, so `requirements.lock.txt`
+      remains valid for `.venv`; `.venv-extract` gets its own lock when
+      it is created.
+- [x] Sampler arms set: **`text_cleaned` primary** (matches the committed
+      `analyze_sentiment(..., text_column='text_cleaned')` default,
+      verified at sentiment_analysis.py:214), raw `text` as comparison.
+- [!] **Competing hypothesis for the collapse, testable on CPU now:**
+      `strip_label_tokens_series` removes NONWORD/language/script
+      placeholders before scoring. fp16 has thousands of representable
+      values in [-1,1], so precision loss alone does not plausibly yield
+      **8** unique scores across 8.59M rows -- degenerate post-strip inputs
+      or an assignment bug fit that number far better. See
+      docs_schema_df_with_sentiment.md.
 - [ ] **Step 2 (extraction) NOT authorized yet** and additionally blocked
       on RAM. Needs ~8-10 GiB free.
 - [ ] GPU presence still unconfirmed (not "no GPU").

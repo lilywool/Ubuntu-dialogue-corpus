@@ -1,0 +1,25 @@
+# Extraction environment -- matches the environment that WROTE
+# df_with_sentiment.pkl, so deserialization compatibility is handled here
+# and never leaks into the model runtime (requirements.txt).
+#
+# pandas pickle compatibility across major versions is not a reliable
+# archival contract, so these are matched to the writer rather than chosen
+# for convenience. Verified read-only from the base Anaconda env on
+# 2026-09-04:
+#     pyarrow 19.0.0
+#     pandas  3.0.1
+#
+# This env is used ONLY by scripts/build_real_sample.py, to load the source
+# pickle once and emit data/real_sample.csv. The output is CSV precisely so
+# the transformer environment can read it with plain pandas 2.2.3 and needs
+# neither pyarrow nor pandas 3.x.
+--index-url https://pypi.org/simple
+
+pandas==3.0.1
+pyarrow==19.0.0
+
+# UNVERIFIED: numpy is left to pip's resolver for now. The pickle stream
+# references numpy._core.numeric._frombuffer, i.e. it was written by
+# numpy 2.x, but the writer's exact numpy version has not been checked.
+# If deserialization raises a numpy-specific error, pin this to match --
+# `conda list numpy` in the base env is a read-only query that answers it.
