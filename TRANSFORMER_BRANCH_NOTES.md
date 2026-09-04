@@ -36,6 +36,25 @@ never shared with the Ubuntu `master` clone or the Yelp repo.
       environment is **partially installed** -- do not trust or generate
       `requirements.lock.txt` (a `pip freeze`) until install completes
       cleanly.
+- [x] **Step 1 (schema inspection) COMPLETE** -- but not by loading the
+      pickle. Both machines lacked the RAM (native Windows: 0.54 GiB of
+      15.3 GiB available; Claude's bridge VM: ~3.5 GiB, no swap). Schema
+      was instead recovered from the pickle byte/opcode stream without
+      deserializing anything -- see `docs_schema_df_with_sentiment.md` for
+      the full 41-column list and consequences, and
+      `scripts/peek_pickle_schema.py` for the tool (head/tail/find/window
+      modes, read-only, bounded memory).
+- [x] `scripts/build_real_sample.py` config corrected against the real
+      schema: `message_id` as the stable id, **no `from`/`to` usernames**,
+      both `text` and `text_cleaned` carried, stratification on the
+      corpus's own `word_count_bucket`.
+- [x] `pyarrow==18.1.0` added to requirements.txt -- the source's string
+      columns are pyarrow-backed, so `pd.read_pickle` would have failed
+      with ModuleNotFoundError regardless of available memory.
+      **`requirements.lock.txt` is now stale** -- re-run the install and
+      re-freeze before step 2.
+- [ ] **Step 2 (extraction) NOT authorized yet** and additionally blocked
+      on RAM. Needs ~8-10 GiB free.
 - [ ] GPU presence still unconfirmed (not "no GPU").
 - [ ] No dtype/CUDA-related code changes made yet to `sentiment_analysis.py`
       in this branch -- unmodified copy, carried over via the clone.

@@ -17,77 +17,99 @@ import sys
 import numpy as np
 import pandas as pd
 
-# --- CONFIG -- confirm/adjust these against the actual file before running ---
-SOURCE_PATH = None  # e.g. r"...\1. Ubuntu-dialogue-corpus\df_with_sentiment.pkl"
+# --- CONFIG -- column names CONFIRMED against the real schema on 2026-09-04
+# via scripts/peek_pickle_schema.py (see docs_schema_df_with_sentiment.md).
+SOURCE_PATH = None  # set only under the step-2 extraction authorization
 OUTPUT_PATH = "data/real_sample.csv"
 N_SAMPLES = 2000
 SEED = 42
 N_LENGTH_BANDS = 5
 
-# Column names as understood from prior notebook work -- CONFIRM these match
-# the actual dataframe's dtypes/columns before running, since this script
-# has not yet been run against the real file.
-LENGTH_COL = "word_count"          # falls back to "text_length" if absent
-TEXT_COL = "text"
-ID_COLS = ["conversation_id", "folder", "from", "to", "date"]
-CARRY_COLS = ["vader_compound", "vader_label"]  # existing scores for parity
+# Stable row identity. Deliberately EXCLUDES `from`/`to`: participant
+# identity is unnecessary for transformer sentiment parity and is avoidable
+# data exposure. message_id is the stable per-row id.
+ID_COLS = ["message_id", "conversation_id"]
+
+# Both text variants are carried: which one was fed to the transformer
+# during the historical run is not recorded anywhere, and it materially
+# changes the diagnosis, so the reproduction must be runnable either way.
+TEXT_COLS = ["text", "text_cleaned"]
+
+# Prefer the corpus's own pre-computed band column; fall back to quantile
+# banding on the raw length if it is absent.
+BAND_COL = "word_count_bucket"
+LENGTH_COL = "word_count"
+
+# Existing scores carried for parity comparison. Note there are NO
+# transformer columns in the source -- the historical collapsed output was
+# never persisted -- so VADER is the only prior signal available.
+CARRY_COLS = ["vader_compound", "vader_label", "text_length"]
 # -------------------------------------------------------------------------
 
 
 def main():
     if not SOURCE_PATH:
         sys.exit(
-            "SOURCE_PATH is not set. This script is intentionally inert "
-            "until explicitly authorized and pointed at a real file -- "
-            "set SOURCE_PATH above, confirm LENGTH_COL/ID_COLS/CARRY_COLS "
-            "against the actual columns, then re-run."
+            "SOURCE_PATH is not set. This script stays inert until the "
+            "step-2 extraction is explicitly authorized -- set SOURCE_PATH, "
+            "then re-run. Requires pyarrow (the source's string columns are "
+            "pyarrow-backed) and enough free RAM for a ~2.9GB pickle."
         )
 
     df = pd.read_pickle(SOURCE_PATH)
+    print(f"Loaded source: {df.shape[0]:,} rows x {df.shape[1]} cols")
 
-    length_col = LENGTH_COL if LENGTH_COL in df.columns else "text_length"
-    if length_col not in df.columns:
-        sys.exit(f"Neither '{LENGTH_COL}' nor 'text_length' found in columns: {list(df.columns)}")
-
-    missing_id = [c for c in ID_COLS if c not in df.columns]
-    missing_carry = [c for c in CARRY_COLS if c not in df.columns]
-    if missing_id:
-        print(f"NOTE: missing expected id columns, dropping: {missing_id}")
-    if missing_carry:
-        print(f"NOTE: missing expected carry columns, dropping: {missing_carry}")
     id_cols = [c for c in ID_COLS if c in df.columns]
+    text_cols = [c for c in TEXT_COLS if c in df.columns]
     carry_cols = [c for c in CARRY_COLS if c in df.columns]
+    if not text_cols:
+        sys.exit(f"None of {TEXT_COLS} present; columns are {list(df.columns)}")
 
-    keep_cols = id_cols + [TEXT_COL, length_col] + carry_cols
-    work = df[keep_cols].copy()
-    work = work.dropna(subset=[TEXT_COL])
+    keep = id_cols + text_cols + [LENGTH_COL] + carry_cols
+    keep = [c for c in dict.fromkeys(keep) if c in df.columns]
+    work = df[keep].copy()
+    del df  # release the 2.9GB source as early as possible
 
-    # Deterministic stratified sample across length bands (quantile-based,
-    # not simply first-N), so short/medium/long/very-long text are all
-    # represented proportionally to their share of the corpus.
-    work["_band"] = pd.qcut(work[length_col], q=N_LENGTH_BANDS, duplicates="drop")
+    primary_text = text_cols[0]
+    work = work.dropna(subset=[primary_text])
+
+    # Stratify on the corpus's own band column when present, else derive
+    # quantile bands -- either way the sample spans short..long text rather
+    # than being a first-N slice.
+    if BAND_COL in work.columns:
+        band = work[BAND_COL]
+        band_source = BAND_COL
+    else:
+        band = pd.qcut(work[LENGTH_COL], q=N_LENGTH_BANDS, duplicates="drop")
+        band_source = f"qcut({LENGTH_COL}, {N_LENGTH_BANDS})"
+    print(f"Stratifying on: {band_source}")
 
     rng = np.random.default_rng(SEED)
+    groups = [g for _, g in work.groupby(band, observed=True)]
+    per_band = N_SAMPLES // max(len(groups), 1)
+
     parts = []
-    band_groups = list(work.groupby("_band", observed=True))
-    per_band = N_SAMPLES // len(band_groups)
-    for _, group in band_groups:
+    for group in groups:
         n = min(per_band, len(group))
-        idx = rng.choice(group.index.to_numpy(), size=n, replace=False)
-        parts.append(work.loc[idx])
+        picked = rng.choice(group.index.to_numpy(), size=n, replace=False)
+        parts.append(work.loc[picked])
+    sample = pd.concat(parts)
 
-    sample = pd.concat(parts).drop(columns="_band")
-
-    # Top up to N_SAMPLES deterministically if bands didn't divide evenly.
     shortfall = N_SAMPLES - len(sample)
     if shortfall > 0:
-        remaining = work.drop(index=sample.index).drop(columns="_band")
-        idx = rng.choice(remaining.index.to_numpy(), size=min(shortfall, len(remaining)), replace=False)
-        sample = pd.concat([sample, remaining.loc[idx]])
+        remaining = work.drop(index=sample.index)
+        n = min(shortfall, len(remaining))
+        picked = rng.choice(remaining.index.to_numpy(), size=n, replace=False)
+        sample = pd.concat([sample, remaining.loc[picked]])
 
-    sample = sample.sort_index()  # deterministic, reproducible ordering
-    sample.to_csv(OUTPUT_PATH, index=True, index_label="source_row_index")
-    print(f"Wrote {len(sample)} rows to {OUTPUT_PATH}")
+    # Deterministic ordering by stable id, not by position in the source.
+    sort_key = id_cols[0] if id_cols else primary_text
+    sample = sample.sort_values(sort_key).reset_index(drop=True)
+
+    sample.to_csv(OUTPUT_PATH, index=False)
+    print(f"Wrote {len(sample):,} rows to {OUTPUT_PATH}")
+    print(f"Columns: {list(sample.columns)}")
+    print("No from/to usernames included by design.")
 
 
 if __name__ == "__main__":

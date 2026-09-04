@@ -18,6 +18,13 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
 
 pandas==2.2.3
+# Required to read df_with_sentiment.pkl: its string columns (and its
+# columns index) are pyarrow-backed ArrowStringArray/large_string. Without
+# this, pd.read_pickle fails with ModuleNotFoundError before any memory
+# issue is even reached. If unpickling raises an Arrow-specific error,
+# repin to match the pyarrow version that WROTE the file (check the base
+# Anaconda env: `conda list pyarrow` -- read-only, changes nothing).
+pyarrow==18.1.0
 vaderSentiment==3.3.2
 torch==2.5.1+cpu
 transformers==4.46.3
