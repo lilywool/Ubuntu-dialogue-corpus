@@ -1,0 +1,28 @@
+# Pinned dependencies for the isolated transformer-sentiment work (transformer branch).
+#
+# GPU status (as of 2026-09-04): unconfirmed, not "no GPU". What's actually
+# established is narrower: `nvidia-smi` is unavailable in the environments
+# checked, and the existing Anaconda install's torch (2.13.0) is a CPU-only
+# build reporting torch.cuda.is_available() == False. That does not rule out
+# a GPU being present but undetected/unconfigured for Python. Do not treat
+# this as confirmed absence of hardware.
+#
+# Pinned to the CPU wheel index explicitly (not relying on a bare version
+# number to imply CPU) so this venv can never silently resolve a CUDA build.
+# Switching to a CUDA index/build requires explicit approval per the
+# project's isolation rules, and should only happen after GPU presence is
+# actually confirmed (e.g. a working nvidia-smi or DXGI/WMI GPU query on
+# native Windows, not just absence of nvidia-smi).
+--index-url https://download.pytorch.org/whl/cpu
+torch==2.5.1
+
+--index-url https://pypi.org/simple
+pandas==2.2.3
+vaderSentiment==3.3.2
+transformers==4.46.3
+tqdm==4.67.1
+
+# TODO: once the .venv is built with the confirmed Python 3.11 interpreter,
+# generate a full platform-specific lock (`python -m pip freeze` or
+# pip-tools) and commit it as requirements.lock.txt -- this file pins direct
+# deps only, not the full resolved/transitive graph.
