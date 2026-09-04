@@ -13,3 +13,8 @@ __pycache__/
 # and for the free LFS storage quota; kept on disk, not versioned
 dialogueText_196.csv
 df_with_sentiment.pkl
+
+# transformer-branch local environment -- repo-local conda-prefix env,
+# never committed (isolation rules: env stays local to this clone)
+.venv/
+requirements.lock.txt.tmp
