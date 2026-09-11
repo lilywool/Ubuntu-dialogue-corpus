@@ -2,14 +2,17 @@
 __pycache__/
 *.pyc
 
-# large data artifacts tracked via Git LFS instead
-# (see .gitattributes -- these patterns stay in git as pointer files)
-
 # OS/editor cruft
 .DS_Store
 .ipynb_checkpoints/
+desktop.ini
+Thumbs.db
 
-# large source/derived data artifacts -- too big for GitHub's 100MB limit
-# and for the free LFS storage quota; kept on disk, not versioned
+# Large corpus artifacts. As of 2026-09-11 these no longer live in this
+# working tree at all -- they were moved to the sibling folder
+# ../_corpus_data/ (see README). These patterns are kept as a safety net so
+# a stray copy can never be committed: they are far over GitHub's 100MB
+# per-file limit and the free LFS quota.
 dialogueText_196.csv
 df_with_sentiment.pkl
+df_current_state.pkl
