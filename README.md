@@ -1,348 +1,195 @@
-# Ubuntu Dialogue Corpus — text cleaning and sentiment pipeline
+# Ubuntu Dialogue Intelligence
 
-This repository prepares the Ubuntu Dialogue Corpus for sentiment analysis and
-later conversation-level analytics. The corpus contains roughly 8.6 million
-technical-support messages whose text can mix commands, stack traces, URLs,
-slang, emoticons, typos, and multiple languages.
+I began this project as a notebook-based investigation of roughly 8.6 million
+Ubuntu technical-support messages. Because the corpus mixes conversation with
+commands, URLs, stack traces, slang, misspellings, glued technical terms, and
+multiple languages, the work grew beyond generic text cleaning.
 
-## Current workflow
-
-The text-processing sequence is complete:
-
-```text
-human normalization
-    -> structural anonymization
-    -> lexicon/slang matching
-    -> glued-term matching
-    -> residual vocabulary analysis
-    -> human-validated residual overlay
-    -> NONWORD/language labels
-```
-
-The immediate next stage is sentiment:
+The notebooks established the analysis through Step 8.5. I then converted that
+work into a reusable local and Databricks pipeline with optional parallelism,
+sampling, transformers, human-reviewed residual labels, and AI-assisted
+classification. After the architecture was complete, I finished the notebooks
+through Step 12 to demonstrate the full data-science process without hiding it
+behind one pipeline call.
 
 ```text
-cleaned text
-    -> VADER, transformer, or both
-    -> sentiment-enriched DataFrame
-    -> outputs/df_with_sentiment.pkl
+Kaggle CSV
+  -> bronze messages
+  -> silver text, sentiment, and NLP features
+  -> gold analytical summaries
+  -> notebook analysis + Streamlit dashboard
 ```
 
-The same Step 8 artifact is written only after compact spaCy/POS and named-
-entity features, stable NMF topics, and the advanced-NLP validation gate have
-run. Transformer emotion classification is an explicit optional arm.
+The local pipeline and Spark/Delta bronze-to-silver-to-gold implementation are
+built. A live Databricks workspace run, deployment configuration, and the
+PowerPoint presentation remain forthcoming.
 
-After sentiment, the next architectural layer is silver-to-gold aggregation:
+## Quick start
 
-- conversation-level summaries
-- user-level summaries
-- sentiment by conversation, user, channel, and time
-- Ubuntu release-cycle trends
-- language and residual distributions
-- topic and technical-term trends
-
-The implemented optional advanced-NLP stage covers spaCy token/POS summaries,
-general named entities, topic modeling, and transformer emotion
-classification. Technical entities remain the responsibility of the reviewed
-Ubuntu lexicon stage. Later work can build phrase- and conversation-level
-models on the validated message features and gold summaries.
-
-## Repository layout
-
-- `pipeline/` — canonical normalization, matching, residual-classification,
-  sentiment, and orchestration modules
-- `reviewed_overlays/` — corpus-specific human-reviewed corrections and
-  classifications
-- `lexicons_and_templates/` — technical vocabulary, slang, emoticons, and
-  structural patterns
-- `notebooks/` — the exploratory steps 1–6 and the continuing steps 7–12
-- `databricks_integration/` — migration notes plus the Spark-native,
-  validated silver-to-gold Delta job; bronze-to-silver remains staged work
-- `dashboard/` — the final Streamlit presentation layer for validated notebook
-  outputs
-- `tests/` — regression and integration tests
-- `tools/` — repository maintenance utilities
-- `outputs/` — generated artifacts; ignored by Git
-
-## Local environment
-
-The project is isolated in a repository-local `.venv` and pins Python
-3.11.16 in `.python-version`.
-
-```powershell
-& "C:\Users\lilli_37fwt34\anaconda3\Scripts\conda.exe" create --prefix ".\.venv" python=3.11.16 -y
-.\.venv\python.exe -m pip install --upgrade pip
-.\.venv\python.exe -m pip install -r requirements.lock.txt
-```
-
-Optional dependencies are separated:
-
-- requirements-dashboard.txt — Streamlit and Plotly for the final dashboard
-- `requirements-transformer.txt` — CPU PyTorch and Transformers
-- `requirements-advanced-nlp.txt` — spaCy, its pinned English model, and
-  scikit-learn topic modeling
-- `requirements-notebooks.txt` — the local Jupyter kernel plus plotting and
-  statistical notebook packages
-
-Install the notebook environment through the same local interpreter, then
-select `.venv\python.exe` as the notebook kernel:
-
-```powershell
-.\.venv\python.exe -m pip install -r notebooks\requirements.txt
-```
-
-Run the tests through the local interpreter:
-
-```powershell
-.\.venv\python.exe -m unittest discover -s tests -v
-```
-
-For a bounded local transformer run, sample before cleaning/NLP extraction:
-
-```powershell
-.\.venv\python.exe -m pipeline.pipeline data\dialogueText_196.csv `
-  --sample-size 10000 --sample-seed 42 --sentiment both --advanced-nlp
-```
-
-The same seed selects the same source rows. Selected rows are restored to
-their original source order before sequence-dependent work; requesting at
-least the full input size does not shuffle the dataset. Source row count,
-selected row count, seed, and whether sampling occurred are retained in
-provenance and the output audit record.
-
-No project step requires modifying the system Python, global `PATH`, Conda
-base environment, Java, CUDA, or GPU drivers.
-
-## Data and paths
-
-The raw CSV is local-only at:
+Download the [Ubuntu Dialogue Corpus from Kaggle](https://www.kaggle.com/datasets/rtatman/ubuntu-dialogue-corpus)
+and place `dialogueText_196.csv` at:
 
 ```text
 data/dialogueText_196.csv
 ```
 
-It is intentionally ignored by Git. The notebooks resolve the repository root
-whether Jupyter starts from the root or from `notebooks/`, and read the CSV
-from the repository-local `data/` directory.
+Create the repository-local Python 3.11.16 environment:
 
-The steps 7–8.5 notebook runs steps 1–6 in the same kernel. It does not read or
-write intermediate pickle checkpoints. The sole notebook pickle export is the
-completed sentiment artifact:
-
-```text
-outputs/df_with_sentiment.pkl
+```powershell
+conda create --prefix ".\.venv" python=3.11.16 -y
+.\.venv\python.exe -m pip install --upgrade pip
+.\.venv\python.exe -m pip install -r requirements.lock.txt
 ```
 
-Generated review CSVs and final artifacts also stay under `outputs/`, which is
-ignored by Git.
+Optional dependencies are separated into
+`requirements-transformer.txt`, `requirements-advanced-nlp.txt`,
+`requirements-dashboard.txt`, and `notebooks/requirements.txt`. Install
+them only for the features you intend to run. Nothing requires modifying
+system Python, Conda base, Java, CUDA, drivers, global `PATH`, or another
+repository's environment.
 
-## Sentiment behavior
+Run a CPU-friendly VADER pipeline:
 
-`pipeline.sentiment_analysis.analyze_sentiment` supports `vader`,
-`transformer`, and `both`. Transformer dtype is explicit and defaults to
-`float32`; GPU availability never silently forces fp16. Model repository
-revisions are pinned as well as Python package versions.
+```powershell
+.\.venv\python.exe -m pipeline.pipeline data\dialogueText_196.csv `
+  --parallel off --sentiment vader --residual-policy manual_review
+```
 
-VADER retains its negative, neutral, and positive proportions in addition to
-compound score and label. The three-class RoBERTa path retains every class
-probability plus predicted label, confidence, expected sentiment
-(`positive - negative`), entropy, normalized entropy, and top-two margin.
-Values are not rounded before validation. Inference uses a configurable
-bounded chunk size, so the 8.6-million-row corpus is never duplicated as one
-giant Python text list.
+Or run expensive features on a reproducible sample:
 
-Every rerun first removes all columns owned by the sentiment stage, preventing
-outputs from an older mode from surviving unnoticed. Validation checks
-coverage, numeric ranges, probability sums, label/argmax agreement,
-confidence/max-probability agreement, signed-score consistency, uncertainty,
-and suspiciously collapsed score diversity. Model, revision, dtype, package
-versions, label order, preprocessing, and batching settings are retained in
-DataFrame provenance metadata.
+```powershell
+.\.venv\python.exe -m pipeline.pipeline data\dialogueText_196.csv `
+  --sample-size 10000 --sample-seed 42 --parallel auto `
+  --sentiment both --residual-policy reviewed `
+  --advanced-nlp --topics nmf --emotion transformer
+```
 
-Upstream model cards: [CardiffNLP three-class sentiment](https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment-latest)
-and [Hartmann seven-class emotion](https://huggingface.co/j-hartmann/emotion-english-distilroberta-base).
+| Choice | Supported options |
+|---|---|
+| Local execution | Automatic, forced, or disabled multiprocessing; optional worker count |
+| Input | Full corpus or seeded sample |
+| Residual handling | Manual review, committed reviewed overlay, or opt-in API |
+| Sentiment | None, VADER, RoBERTa, or both |
+| Advanced NLP | spaCy features, global NMF topics, transformer emotion |
+| Precision | Explicit float32, float16, or bfloat16; GPU detection never silently selects fp16 |
 
-The final gate also validates the deterministic cleaning layer: row/index
-preservation, duplicate columns, non-null cleaned text, match-list/count
-agreement, placeholder/count agreement, residual flags, and lexicon flags.
-Structural placeholder tokens are protected from glued-term scanning (for
-example, `address` inside `EMAILADDRESS` is not a technical-term match).
+Generated silver data, review files, model artifacts, dashboard data, and
+append-only audit logs stay under the ignored `outputs/` directory.
 
-When a human-labeled evaluation set is available,
-`pipeline.evaluation.evaluate_sentiment_labels` measures coverage, accuracy,
-macro-F1, balanced accuracy, per-class precision/recall/F1, confusion matrix,
-multiclass Brier score, log loss, and expected calibration error. When both
-backends run, validation also records VADER/transformer label agreement and
-score correlation. These are diagnostics, not hard-coded claims of model
-accuracy; the project does not substitute Yelp star ratings for Ubuntu gold
-labels.
+## Pipeline design
 
-The CPU preprocessing diagnostic did not reproduce the historical transformer
-score collapse. A representative real-data parity run and a controlled GPU
-dtype comparison remain separate validation work before a full transformer
-run.
+The deterministic layer combines:
 
-## Advanced NLP behavior
+- 873 Ubuntu/Linux and computing terms across 15 categories;
+- 351 reviewed slang, emoticon, IRC, and symbolic entries;
+- structural anonymization for contact/network identifiers, URLs, paths,
+  shortcuts, dumps, quantities, and related patterns;
+- more than 1,300 reviewed chat, typo, and shorthand normalizations;
+- glued-term detection; and
+- thousands of human-reviewed jargon and language decisions.
 
-`pipeline/advanced_nlp.py` coordinates three independently callable stages:
+Residual behavior is explicit. `manual_review` leaves unresolved text
+unchanged, `reviewed` applies the committed human classifications, and
+`api` sends only the bounded residual vocabulary—not full messages—to an
+OpenAI-compatible endpoint. API mode requires a key and never stores it in
+pipeline output.
 
-- `pipeline/spacy_features.py` — batched tokenization, compact POS summaries,
-  normalized POS ratios, sentence/lexical/negation/punctuation features, and
-  general named entities with label-level counts
-- `pipeline/topic_modeling.py` — one deterministic bounded-sample NMF fit,
-  followed by bounded-batch assignment using the same model, explicit
-  vocabulary coverage, normalized topic confidence, entropy, and margin
-- `pipeline/emotion_analysis.py` — optional Hugging Face emotion scoring with
-  explicit device and dtype
+Sentiment retains the complete VADER distribution and, when selected, all
+three RoBERTa probabilities plus confidence, expected sentiment, entropy, and
+margin. Optional NLP adds compact spaCy POS/entity summaries, one globally
+fitted NMF topic model, and seven-class transformer emotion probabilities.
+Technical terms remain governed by the reviewed Ubuntu lexicon rather than
+being counted again through spaCy NER.
 
-Technical entities are not re-counted by spaCy. The earlier
-`tech_lexicon_matches` and `tech_lexicon_match_count` columns remain the
-canonical technical-entity features. Full token/POS JSON is opt-in because it
-is unsuitable as the default representation for 8.6 million pandas rows.
+Model revisions, device, dtype, batching, and inference chunks are explicit.
+Validation checks row conservation, feature consistency, NLP coverage,
+probability distributions, topic diversity, and collapsed model output before
+writes are allowed.
 
-The advanced stage validates coverage, JSON/count consistency, topic scores,
-transformer score ranges, and frozen outputs before the notebook writes its
-single Step 8 artifact.
-
-The remainder of `notebooks/Ubuntu_step7-12.ipynb` completes the analytical
-workflow in the same notebook style:
-
-- Step 9 selects a deterministic sample of complete conversations, builds
-  validated gold summaries, calculates robust Spearman correlations, and runs
-  effect-size-aware hypothesis tests with Holm correction;
-- Step 10 produces bounded distribution/relationship plots and aggregated time,
-  release-cycle, and topic figures at publication resolution;
-- Step 11 compares a dummy baseline, logistic regression, and random forest,
-  tunes the strongest real model, and evaluates it on an untouched test set;
-- Step 12 evaluates held-out model performance and baseline lift, quantifies a
-  bounded triage-impact scenario, records limitations and next steps, and writes
-  reproducibility documentation. A separate downstream handoff exports the
-  privacy-bounded tables and manifest used by the Streamlit dashboard.
-
-The supervised target is whether another sender replies to a conversation's
-initial message. Only features available at posting time are eligible;
-conversation duration, message count, response gaps, later messages, and raw
-user identities are explicitly excluded as leakage.
-
-### Design lineage and improvements
-
-The advanced-NLP workflow was modeled on the architectural patterns proven in
-the separate
+The architecture was modeled on my
 [Yelp Review Intelligence](https://github.com/lilywool/yelp-review-intelligence)
-repository: import-safe model initialization, optional transformer features,
-validation before output, and a clear separation between source text and
-generated features. The implementation here is independent and adapted to the
-Ubuntu corpus rather than sharing code, data, or environments with Yelp.
+project and extended for neutral-aware sentiment, Ubuntu technical language,
+global topic identity, bounded inference, richer uncertainty features,
+rerun-safe outputs, and stricter validation.
 
-For this repository, those patterns were extended in several ways:
+## Notebooks and dashboard
 
-- advanced NLP is separated into dedicated spaCy, topic-modeling, emotion,
-  sentiment, and orchestration modules rather than one feature-engineering
-  script;
-- expensive local stages use the shared, Windows-safe execution backend in
-  `pipeline/parallel_execution.py`, while transformer inference remains
-  batched in one process to avoid loading multiple copies of a large model;
-- Ubuntu technical entities remain governed by the existing reviewed lexicon
-  and residual pipeline, avoiding a second spaCy-derived count for the same
-  concept;
-- spaCy uses batched processing and compact POS/entity summaries by default,
-  adds length-normalized POS ratios and lexical/sentence/negation features,
-  and keeps full token-level JSON as an explicit opt-in;
-- topic modeling fits one deterministic model on a bounded representative
-  sample and reuses it for every row, so topic IDs retain one corpus-wide
-  meaning and can later be shared across Databricks partitions; out-of-
-  vocabulary messages stay explicitly unassigned instead of being falsely
-  labeled topic 0;
-- transformer sentiment and emotion both use explicit device and dtype
-  settings and pinned model revisions, so GPU availability never silently
-  enables fp16 and a moving model repository cannot silently change results;
-- sentiment retains full VADER and three-class transformer distributions,
-  principled signed transformer expectation, entropy, and decision margin;
-- optional emotion output retains all seven class probabilities plus entropy
-  and decision margin instead of only the winning label/confidence;
-- transformer stages stream bounded inference chunks rather than building a
-  corpus-sized Python list, while still using internal model batching;
-- stage-owned column registries remove stale outputs before every rerun;
-- numeric features use compact, explicit dtypes (`float32`, `int32`, and
-  nullable `Int16` topic IDs) to keep the 8.6-million-row artifact tractable;
-- validation covers probability conservation and internal agreement as well
-  as score ranges, coverage, JSON/count consistency, topic diversity, and the
-  historical transformer-collapse failure mode;
-- successful outputs append a JSON-lines audit record with validation results,
-  configuration, provenance, output size, and UTC completion time; and
-- a dependency-light gold-label evaluator covers both discrimination and
-  probability calibration rather than relying only on a rating correlation;
-- the modules preserve one message per row and expose partition-callable
-  functions for the planned Spark `mapInPandas` implementation.
+- `Ubuntu_Project_Steps1-6.ipynb` covers ingestion, memory, structure, and
+  conversation, user, and temporal features.
+- `Ubuntu_step7-12.ipynb` continues through cleaning, sentiment, advanced NLP,
+  statistics, visualization, machine learning, and evaluation.
+- Step 12 reports held-out performance, baseline lift, business impact,
+  limitations, next steps, and reproducibility documentation.
 
-These are concrete extensions beyond Yelp's sentiment baseline, which stores
-the VADER distribution but reduces its optional binary transformer to a
-winning label/confidence and a derived signed confidence. Ubuntu's neutral-
-aware three-class distribution and expected score preserve information needed
-for later conversation-level aggregation without treating neutral messages as
-implicitly positive or negative.
+The completed notebook artifact is `outputs/df_with_sentiment.pkl`. The
+notebooks expose each analytical step and do not call the top-level pipeline.
 
-## Streamlit dashboard
+The Streamlit dashboard provides descriptive, diagnostic, predictive, and
+prescriptive views over privacy-bounded outputs. It excludes raw messages and
+user identities.
 
-The final pipeline application is the Ubuntu Dialogue Intelligence dashboard
-under dashboard/. After notebook Step 12 completes its evaluation, the separate
-dashboard-handoff cells call pipeline.dashboard.export_dashboard_bundle to
-validate and atomically write the dashboard's input tables and portable
-manifest. The dashboard revalidates the bundle on load and refuses
-schema-mismatched, incomplete, or privacy-unsafe inputs.
-
-Install its optional dependencies into this repository's local environment:
-
-~~~powershell
+```powershell
 .\.venv\python.exe -m pip install -r requirements-dashboard.txt
-~~~
-
-After running notebook Steps 7-12, launch it from the repository root:
-
-~~~powershell
 .\.venv\python.exe -m streamlit run dashboard\app.py
-~~~
+```
 
-The four views mirror the Yelp project's information architecture while using
-Ubuntu-specific measures:
+## Databricks
 
-- **Descriptive** — response outcomes, conversation size, time trends, topics
-- **Diagnostic** — correlations, corrected hypothesis tests, response gaps
-- **Predictive** — held-out model metrics, model comparison, feature importance
-- **Prescriptive** — supported low-response topic priorities and release-cycle
-  monitoring, explicitly presented as operational leads rather than causal facts
+The bronze-to-silver job reads a Unity Catalog table, Delta path, or CSV with
+Spark. Its first `mapInPandas` pass performs deterministic text processing.
+Spark then aggregates the residual vocabulary and fits one bounded global NMF
+model when requested. A second pass applies broadcast labels/topics and runs
+sentiment and optional NLP. Models are cached per Python worker.
 
-Sidebar filters drill into conversation date, response outcome, and dominant
-topic. Dashboard exports contain no raw message text or usernames. Set
-UBUNTU_DASHBOARD_DATA only in the current process or an uncommitted local
-configuration if the bundle lives somewhere other than
-outputs/dashboard_data.
+Whole-job validation precedes the Delta silver write and audit record. The
+silver-to-gold job then produces any of these grains:
 
-## Databricks status
+`conversation`, `user`, `date`, `channel`, `release`, `language`,
+`residual`, `technical`, `topic`, `entity`, or seeded `sample`.
 
-The local pandas pipeline remains the feature-definition source of truth. A
-Spark-native silver-to-gold job now reads a silver Delta table/path, performs
-global Spark aggregations, validates conservation and key uniqueness, writes
-the selected Delta gold table, and appends a Delta audit record. It supports
-conversation, directional user, date, channel, release-cycle, language,
-residual, technical-term, topic, entity, and seeded-sample outputs.
+```text
+python -m databricks_integration.scripts.bronze_to_silver_ubuntu \
+  --input-table catalog.schema.bronze_ubuntu_dialogue \
+  --output-table catalog.schema.silver_ubuntu_dialogue \
+  --audit-table catalog.schema.pipeline_audit \
+  --residual-policy reviewed --sentiment vader
+```
 
-Spark-native bronze ingestion, the partition-safe `mapInPandas` NLP stage,
-Asset Bundles, and complete local-to-distributed parity tests remain future
-work. The pandas bronze-to-silver adapter is not represented as a distributed
-Databricks implementation.
+Partition transformations have deterministic local parity coverage. A live
+Databricks run is not claimed until a workspace, storage target, runtime, and
+worker configuration are selected. See
+[databricks_integration/README.md](databricks_integration/README.md) for the
+full execution contract.
+
+## Repository map
+
+- `pipeline/` — reusable processing, NLP, validation, aggregation, and audit
+- `lexicons_and_templates/` — reviewed terms and structural patterns
+- `reviewed_overlays/` — human normalization and residual decisions
+- `notebooks/` — complete twelve-step analysis
+- `databricks_integration/` — distributed Spark/Delta jobs
+- `dashboard/` — Streamlit application
+- `tests/` — regression, parity, notebook, aggregation, and dashboard tests
+
+Run all tests with:
+
+```powershell
+.\.venv\python.exe -m unittest discover -s tests -v
+```
+
+## Next steps
+
+- validate a small real-data slice on the selected Databricks runtime;
+- add an Asset Bundle after the cloud and cluster shape are known;
+- run the controlled GPU dtype and full-corpus transformer jobs; and
+- publish the PowerPoint presentation.
 
 ## Attribution and license
 
-Built on the Ubuntu Dialogue Corpus:
+Built on Ryan Lowe, Nissan Pow, Iulian Serban, and Joelle Pineau's
+*The Ubuntu Dialogue Corpus: A Large Dataset for Research in Unstructured
+Multi-Turn Dialogue Systems* ([paper](https://arxiv.org/abs/1506.08909);
+[dataset-generation code](https://github.com/rkadlec/ubuntu-ranking-dataset-creator)).
 
-> Ryan Lowe, Nissan Pow, Iulian Serban, and Joelle Pineau. “The Ubuntu
-> Dialogue Corpus: A Large Dataset for Research in Unstructured Multi-Turn
-> Dialogue Systems.” *SIGDIAL*, 2015. arXiv:1506.08909.
-
-- Paper: https://arxiv.org/abs/1506.08909
-- Dataset-generation scripts:
-  https://github.com/rkadlec/ubuntu-ranking-dataset-creator (Apache-2.0)
-
-Repository code is MIT licensed. That license does not cover the underlying
-corpus. The raw corpus is not intended for redistribution from this repository.
+Repository code is MIT licensed. The underlying corpus is not covered by that
+license and is not redistributed here.

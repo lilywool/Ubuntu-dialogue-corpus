@@ -46,15 +46,15 @@ class AnalysisNotebookTests(unittest.TestCase):
         self.assertIn("conversation_duration_mins", self.code)
         self.assertNotIn("numeric_feature_candidates = [\n    'conversation_message_count'", self.code)
 
-    def test_dashboard_exports_exclude_raw_text_and_usernames(self):
-        self.assertIn("from pipeline.dashboard import export_dashboard_bundle", self.code)
-        self.assertIn("export_dashboard_bundle(", self.code)
+    def test_notebook_does_not_call_dashboard_exports(self):
+        """Dashboard packaging remains a downstream consumer of gold outputs."""
+        self.assertNotIn("from pipeline.dashboard import export_dashboard_bundle", self.code)
+        self.assertNotIn("export_dashboard_bundle(", self.code)
 
     def test_step_12_covers_evaluation_and_documentation(self):
         self.assertIn("business_impact_assessment", self.code)
         self.assertIn("evaluation_manifest.json", self.code)
         self.assertIn("conversation_response_model_card.md", self.code)
-        self.assertIn("Downstream dashboard handoff (after Step 12)", self.markdown)
 
 
 if __name__ == "__main__":

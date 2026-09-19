@@ -1,9 +1,11 @@
 # Databricks integration layer
 
-This subfolder contains the staged Databricks adapter for bronze-to-silver work
-and a Spark-native, validated silver-to-gold Delta job. It is not yet a complete
-production deployment because distributed ingestion/NLP orchestration and Asset
-Bundle configuration remain outstanding.
+This subfolder contains the distributed Databricks implementation of the
+Ubuntu pipeline: Spark-native bronze ingestion and feature preparation, two
+partition-safe `mapInPandas` NLP passes, validated Delta silver output, and
+Spark-native silver-to-gold aggregation. Live workspace verification and an
+optional Asset Bundle remain deployment work; the processing path itself is
+implemented.
 
 The intended architecture is:
 
@@ -18,34 +20,43 @@ The intended architecture is:
 - `outputs/` — generated intermediate/final tables and export artifacts
 - `notebooks/` — optional notebook-driven exploration and validation
 
-## Intended workflow
+## Distributed workflow
 
-1. Load raw text into a bronze table.
-2. Apply the lexicon pass and normalization rules.
-3. Build the unresolved residual vocabulary.
-4. Separate glued matches from remaining residuals.
-5. If an API key is configured, call the residual classifier only on the unresolved set.
-6. Otherwise, leave residuals unchanged for manual review. Use the explicit
-   `reviewed` policy when the committed deterministic fallback is desired.
-7. Write the resolved silver table and then aggregate into gold-level metrics.
+1. Read one Unity Catalog table, Delta path, or CSV with Spark.
+2. Normalize the raw Ubuntu fields and derive stable SHA-256 conversation and
+   message identifiers plus temporal, user, release-cycle, and conversation
+   features.
+3. Run deterministic normalization, anonymization, lexicon matching,
+   glued-term matching, and residual extraction in the first `mapInPandas`
+   pass. Each Python partition uses one local worker because Spark supplies the
+   outer parallelism.
+4. Aggregate the unresolved vocabulary globally with Spark. Leave it untouched
+   for `manual_review`, apply the committed overlay for `reviewed`, or classify
+   only that bounded vocabulary on the driver for `api`.
+5. When NMF is enabled, collect one seeded, bounded fitting sample and fit one
+   model on the driver. Broadcast the residual lookup and fitted NMF bundle so
+   every partition uses the same labels and topic IDs.
+6. Run sentiment, spaCy, global-topic assignment, and optional transformer
+   emotion scoring in the second `mapInPandas` pass. Transformer and spaCy
+   module caches load a model once per Python worker and reuse it across Arrow
+   batches.
+7. Validate the recombined Spark DataFrame globally, write one Delta silver
+   target, and append a secret-free audit row.
+8. Aggregate the validated silver table into the selected gold grain with the
+   separate Spark/Delta gold job.
 
-Advanced NLP functions are importable from `pipeline/` for a future
-`mapInPandas` stage. spaCy should run with one local worker inside each Spark
-partition, because Spark supplies the outer parallelism. Topic modeling must
-be fitted once on a representative sample with
-`pipeline.topic_modeling.fit_topic_model`; broadcast and reuse that model for
-every partition so topic IDs have one corpus-wide meaning. Never fit NMF
-inside individual partitions. Transformer sentiment and emotion inference
-likewise remain batched within one process per GPU/partition, use bounded
-inference chunks, and require explicit model revision, device, and dtype.
-Partition results must preserve the complete probability/uncertainty columns;
-do not reduce them to only the winning label before the Delta write.
+The only intentional driver collections are the bounded NMF fit sample and the
+unique residual vocabulary; the latter has a configurable maximum-size guard.
+The full message table is never converted to pandas. Complete probability and
+uncertainty columns are retained rather than reducing transformer output to a
+winning label.
 
-The local validators are partition-callable, but full-job validation must run
-again after unioning partitions so collapsed global distributions, probability
-inconsistencies, and missing partitions cannot hide behind per-partition
-success. The local JSON-lines audit schema is mirrored by the implemented
-append-only Delta audit table for the Spark gold job.
+Partition-level deterministic checks run inside the pandas stages. Full-job
+validation runs again after Spark recombines the partitions so missing rows,
+duplicate identifiers, collapsed global distributions, invalid probabilities,
+and inadequate NLP coverage cannot hide behind per-partition success. Both
+silver and gold jobs append to a Delta audit table and record
+`pipeline.schema.FEATURE_SCHEMA_VERSION`.
 `pipeline.schema.FEATURE_SCHEMA_VERSION` is the explicit contract version to
 store with every Delta write; schema changes should update that version rather
 than silently altering downstream tables.
@@ -58,15 +69,15 @@ If no API key is configured, do not silently run the API and do not convert
 the residual vocabulary to `NONWORD`. The adapter defaults to
 `manual_review`; API mode without a key fails explicitly.
 
-## Not implemented yet
+## Verification boundary
 
-- Spark-native bronze ingestion and a partition-safe `mapInPandas` NLP stage
-- Asset Bundle job/cluster configuration
-- small-slice parity tests against the local pipeline
-
-Spark/Delta silver-to-gold aggregation, global validation, Delta writes, and
-append-only Delta audit records are implemented in
-`scripts/silver_to_gold_ubuntu.py`.
+The partition transformation has a deterministic small-slice parity test
+against the canonical local VADER pipeline. Both Databricks entry points are
+imported and syntax-checked in the local test suite. A successful live-cluster
+run is intentionally not claimed yet: the target workspace, cloud storage,
+Databricks runtime, worker/GPU shape, and cluster-installed libraries must be
+selected and recorded first. Asset Bundle configuration is optional deployment
+work once those choices are known.
 
 ## Suggested Delta tables
 
@@ -107,7 +118,43 @@ message-level table:
 Every local gold write is validated and appended to the project-local JSONL
 audit log.
 
-## Databricks Spark/Delta gold job
+## Databricks Spark/Delta bronze-to-silver job
+
+The bronze job accepts exactly one source and one destination. A typical
+CPU/VADER run is:
+
+```text
+python -m databricks_integration.scripts.bronze_to_silver_ubuntu \
+  --input-table catalog.schema.bronze_ubuntu_dialogue \
+  --output-table catalog.schema.silver_ubuntu_dialogue \
+  --audit-table catalog.schema.pipeline_audit \
+  --write-mode overwrite \
+  --repartition-count 32 \
+  --residual-policy reviewed \
+  --sentiment vader \
+  --advanced-nlp --topics nmf
+```
+
+Sources may instead use `--input-delta-path` or `--input-csv-path`; destinations
+may use `--output-delta-path`. Local-style bounded execution is available with
+`--sample-size` and `--sample-seed`. Transformer sentiment and emotion retain
+explicit model revision, batch size, inference chunk, device, and dtype
+arguments. GPU availability never changes dtype automatically.
+
+For API residual classification, retrieve the key from a Databricks secret
+scope in a notebook or job wrapper and pass it only to
+`run_bronze_to_silver_spark(..., api_key=secret)`. The key is used on the driver
+and is neither broadcast nor written to output metadata. API mode without a
+key fails closed.
+
+Use a Databricks Runtime or ML Runtime whose built-in Python, Arrow, Spark, and
+PyTorch versions match the selected workload. Install this repository's
+ordinary and optional Python dependencies as cluster libraries without
+replacing Spark's own PySpark installation. CPU-only PyTorch wheels from
+`requirements-transformer.txt` are for the repository-local Windows
+environment; do not install that CPU wheel on a GPU Databricks cluster.
+
+## Databricks Spark/Delta silver-to-gold job
 
 Run the Databricks entry point as a job against either a Unity Catalog table or
 a Delta path. For example:
@@ -141,4 +188,6 @@ partition.
 
 ## Notes
 
-This is intentionally isolated from the main repo root to avoid breaking module imports while still creating a clean Databricks-ready structure.
+This integration remains inside the same repository because it imports the
+canonical `pipeline/`, `lexicons_and_templates/`, and `reviewed_overlays/`
+modules. It does not duplicate or fork those feature definitions.
