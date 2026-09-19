@@ -1,0 +1,2 @@
+-r ../requirements-notebooks.txt
+-r ../requirements-advanced-nlp.txt

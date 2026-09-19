@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+title: "Ubuntu Dialogue Corpus: text cleaning and sentiment pipeline"
+message: "If this repository supports your work, please cite it and the original Ubuntu Dialogue Corpus paper."
+type: software
+authors:
+  - family-names: Wool
+    given-names: Lily
+    email: lwool@sandiego.edu
+    affiliation: University of San Diego
+date-released: 2026-09-18
+license: MIT
+repository-code: "https://github.com/lilywool/Ubuntu-dialogue-corpus"
+references:
+  - type: article
+    authors:
+      - family-names: Lowe
+        given-names: Ryan
+      - family-names: Pow
+        given-names: Nissan
+      - family-names: Serban
+        given-names: Iulian
+      - family-names: Pineau
+        given-names: Joelle
+    title: "The Ubuntu Dialogue Corpus: A Large Dataset for Research in Unstructured Multi-Turn Dialogue Systems"
+    year: 2015
+    journal: SIGDIAL
+    url: "https://arxiv.org/abs/1506.08909"

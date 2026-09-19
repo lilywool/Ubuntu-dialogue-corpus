@@ -1,6 +1,11 @@
 # byte-compiled / cache
 __pycache__/
 *.pyc
+.venv/
+.venv-*/
+.env
+.env.*
+!.env.example
 
 # OS/editor cruft
 .DS_Store
@@ -8,11 +13,15 @@ __pycache__/
 desktop.ini
 Thumbs.db
 
-# Large corpus artifacts. As of 2026-09-11 these no longer live in this
-# working tree at all -- they were moved to the sibling folder
-# ../_corpus_data/ (see README). These patterns are kept as a safety net so
-# a stray copy can never be committed: they are far over GitHub's 100MB
-# per-file limit and the free LFS quota.
+# Local corpus data
+data/*
+!data/.gitkeep
+
+# Generated local artifacts
+/outputs/
+
+# Large corpus artifacts are always local-only. Keep filename-level guards in
+# addition to the data/ and outputs/ directory rules.
 dialogueText_196.csv
 df_with_sentiment.pkl
 df_current_state.pkl
