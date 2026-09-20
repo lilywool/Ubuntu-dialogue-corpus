@@ -8,10 +8,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
+from pathlib import Path
 from time import perf_counter
 from typing import Any
 from uuid import uuid4
+
+# Python-script job tasks execute this file directly rather than with
+# ``python -m``. Keep imports repository-local and independent of global
+# ``PYTHONPATH`` configuration.
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPOSITORY_ROOT))
 
 from databricks_integration.run_metrics import (
     append_run_metrics_delta,

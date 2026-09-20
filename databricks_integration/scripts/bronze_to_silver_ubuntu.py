@@ -20,15 +20,24 @@ import argparse
 import json
 import os
 import re
+import sys
 from collections import Counter
 from dataclasses import asdict, replace
 from datetime import datetime, timezone
 from functools import partial
+from pathlib import Path
 from time import perf_counter
 from typing import Any, Iterable, Mapping
 from uuid import uuid4
 
 import pandas as pd
+
+# Python-script job tasks execute this file directly rather than with
+# ``python -m``. Add only this repository's root so the canonical project
+# packages resolve identically from a Git checkout or workspace Git folder.
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+if str(_REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPOSITORY_ROOT))
 
 from pipeline.pipeline import PipelineConfig, run_pipeline
 from pipeline.schema import FEATURE_SCHEMA_VERSION
