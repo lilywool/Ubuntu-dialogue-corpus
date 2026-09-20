@@ -341,10 +341,17 @@ def main() -> None:
 
     import pandas as pd
 
+    api_key = None
+    if args.residual_policy == "api":
+        api_key = _resolve_api_key()
+        if not api_key:
+            parser.error("--residual-policy api requires OPENAI_API_KEY")
+
     frame = pd.read_csv(args.input_csv)
     config = PipelineConfig(
         residual_policy=args.residual_policy,
         maximum_nonword_token_rate=args.maximum_nonword_token_rate,
+        api_key=api_key,
         residual_api_model=args.residual_api_model,
         residual_api_batch_size=args.residual_api_batch_size,
         residual_api_timeout_seconds=args.residual_api_timeout_seconds,

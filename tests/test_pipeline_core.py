@@ -10,7 +10,7 @@ import pandas as pd
 from pipeline.apply_lexicons import anonymize_structural
 from pipeline.data_preparation import optimize_dtypes, prepare_text_column
 from pipeline.parallel_execution import recommended_workers
-from pipeline.pipeline import PipelineConfig, run_pipeline
+from pipeline.pipeline import PipelineConfig, _resolve_api_key, run_pipeline
 from pipeline.residual_stage import (
     apply_api_labels,
     classify_residuals,
@@ -95,6 +95,26 @@ class DataPreparationTests(unittest.TestCase):
         self.assertEqual(scrubbed.iloc[1], "contact EMAILADDRESS")
         self.assertEqual(counts.loc[1, "domain_count"], 0)
         self.assertEqual(counts.loc[1, "email_count"], 1)
+
+
+class APIKeyResolutionTests(unittest.TestCase):
+    def test_explicit_key_wins_over_environment(self):
+        with patch(
+            "pipeline.pipeline.os.getenv",
+            return_value="sk-fixture-environment",
+        ):
+            key = _resolve_api_key("sk-fixture-explicit")
+
+        self.assertEqual(key, "sk-fixture-explicit")
+
+    def test_environment_key_is_resolved(self):
+        with patch(
+            "pipeline.pipeline.os.getenv",
+            return_value="sk-fixture-environment",
+        ):
+            key = _resolve_api_key()
+
+        self.assertEqual(key, "sk-fixture-environment")
 
 
 class ResidualStageTests(unittest.TestCase):
