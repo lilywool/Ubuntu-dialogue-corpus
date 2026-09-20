@@ -27,15 +27,15 @@ from pipeline.parallel_execution import map_rows
 from pipeline.glued_terms import find_glued_matches
 
 # category -> (compiled pattern, placeholder token, count-column name).
-# Order matters for the replacement pass below: email before url_or_domain
-# (so an email's domain half is consumed as EMAILADDRESS before the domain
-# pattern ever sees it -- belt-and-suspenders on top of the (?<!@) lookbehind
-# already in URL_OR_DOMAIN_RE), and everything else is independent of that
-# pair (no digit/punctuation shape overlaps with IPv4, IPv6, menu paths, or
-# keyboard shortcuts), so their relative order doesn't matter.
+# Order matters for the replacement pass below: a complete URL is a broader
+# structural container and must be consumed before an email-like fragment in
+# its path (for example, a mailing-list archive URL containing
+# ``lug@linux.or.ug``). The bare-domain branch already excludes domains
+# immediately preceded by ``@``, so ordinary email addresses remain available
+# for the following email pass.
 _ANONYMIZATION_SPEC = [
-    ("email_address", EMAIL_ADDRESS_RE, "EMAILADDRESS", "email_count"),
     ("url_or_domain", URL_OR_DOMAIN_RE, "WEBSITEDOMAIN", "domain_count"),
+    ("email_address", EMAIL_ADDRESS_RE, "EMAILADDRESS", "email_count"),
     ("phone_number", PHONE_NUMBER_RE, "PHONENUMBER", "phone_count"),
     ("ssn", SSN_RE, "SSN", "ssn_count"),
     ("ipv4_address", IPV4_ADDRESS_RE, "IPADDRESS", "ipv4_count"),
@@ -76,18 +76,26 @@ def anonymize_structural(series, verbose=False):
     'domain_count', 'phone_count', 'ipv4_count', 'ipv6_count',
     'menu_path_count', 'keyboard_shortcut_count') -- counts only, never the
     matched strings themselves (see the module docstring's privacy note).
+    Counts describe placeholders in the final scrubbed text. Deriving them
+    after every replacement prevents a later, broader structural replacement
+    from leaving a stale count for a placeholder it consumed.
     Each of the 7 replacement passes is vectorized (not per-row), so there's
     no per-row progress bar to show here -- verbose=True instead prints a
     one-line timestamp per category as it completes, so you can at least see
     it moving through the 7 steps rather than staring at a silent cell."""
     out = series
-    counts = {}
     for category, pattern, placeholder, count_col in _ANONYMIZATION_SPEC:
         t0 = time.time()
-        counts[count_col] = _count_matches(out, pattern)
         out = out.str.replace(pattern, placeholder, regex=True)
         if verbose:
             print(f"  [{time.strftime('%H:%M:%S')}] anonymized {category} ({time.time()-t0:.1f}s)")
+    counts = {
+        count_col: _count_matches(
+            out,
+            re.compile(rf"\b{re.escape(placeholder)}\b"),
+        )
+        for _category, _pattern, placeholder, count_col in _ANONYMIZATION_SPEC
+    }
     return out, pd.DataFrame(counts)
 
 

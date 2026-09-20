@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import pandas as pd
 
+from pipeline.apply_lexicons import anonymize_structural
 from pipeline.data_preparation import optimize_dtypes, prepare_text_column
 from pipeline.parallel_execution import recommended_workers
 from pipeline.pipeline import PipelineConfig, run_pipeline
@@ -76,6 +77,24 @@ class DataPreparationTests(unittest.TestCase):
         self.assertEqual(result["message_id"].tolist(), ["c" * 64, "d" * 64])
         self.assertTrue(pd.api.types.is_unsigned_integer_dtype(result["folder"]))
         self.assertTrue(pd.api.types.is_unsigned_integer_dtype(result["turn_count"]))
+
+    def test_url_containing_email_like_path_has_final_placeholder_counts(self):
+        text = pd.Series(
+            [
+                "http://www.mail-archive.com/lug@linux.or.ug/msg14772.html",
+                "contact person@example.com",
+            ],
+            dtype="string",
+        )
+
+        scrubbed, counts = anonymize_structural(text)
+
+        self.assertEqual(scrubbed.iloc[0], "WEBSITEDOMAIN")
+        self.assertEqual(counts.loc[0, "domain_count"], 1)
+        self.assertEqual(counts.loc[0, "email_count"], 0)
+        self.assertEqual(scrubbed.iloc[1], "contact EMAILADDRESS")
+        self.assertEqual(counts.loc[1, "domain_count"], 0)
+        self.assertEqual(counts.loc[1, "email_count"], 1)
 
 
 class ResidualStageTests(unittest.TestCase):
