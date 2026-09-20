@@ -625,7 +625,16 @@ def transform_enrichment_partition(
     from pipeline.residual_stage import apply_api_labels
     from pipeline.validation import validate_core_pipeline
 
+    # Spark/Arrow commonly returns array columns to pandas as numpy arrays.
+    # Normalize only that distributed representation; retain the canonical
+    # local list/tuple records so local and distributed parity remains exact.
     result = frame.copy()
+    if any(
+        column in result
+        and not result[column].map(lambda value: isinstance(value, list)).all()
+        for column in _CORE_LIST_COLUMNS
+    ):
+        result = _normalize_match_lists(result)
     if residual_labels:
         result = apply_api_labels(result, dict(residual_labels), text_col=text_col)
     validate_core_pipeline(

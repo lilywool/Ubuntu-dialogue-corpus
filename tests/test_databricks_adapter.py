@@ -168,6 +168,42 @@ class DatabricksAdapterPolicyTests(unittest.TestCase):
         self.assertEqual(normalized.at[0, "glued_matches"][0]["term"], "aptget")
         self.assertEqual(normalized.at[0, "residual_words"], ["please", "help"])
 
+    def test_enrichment_normalizes_arrow_arrays_before_core_validation(self):
+        frame = pd.DataFrame({
+            "message_id": ["m1"],
+            "conversation_id": ["c1"],
+            "text": ["sudo apt update works great"],
+        })
+        core = transform_core_partition(frame)
+        for column in (
+            "structural_matches",
+            "tech_lexicon_matches",
+            "slang_matches",
+            "glued_matches",
+            "residual_words",
+        ):
+            core[column] = core[column].map(
+                lambda values: np.array(values, dtype=object)
+            )
+
+        enriched = transform_enrichment_partition(
+            core,
+            config=PipelineConfig(
+                sentiment_mode="none",
+                advanced_nlp=False,
+                parallel=False,
+            ),
+        )
+
+        for column in (
+            "structural_matches",
+            "tech_lexicon_matches",
+            "slang_matches",
+            "glued_matches",
+            "residual_words",
+        ):
+            self.assertIsInstance(enriched.at[0, column], list)
+
     def test_serverless_delta_materialization_names_are_validated(self):
         run_id = "a" * 32
 
