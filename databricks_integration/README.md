@@ -192,8 +192,12 @@ arguments. GPU availability never changes dtype automatically.
 For API residual classification, retrieve the key from a Databricks secret
 scope in a notebook or job wrapper and pass it only to
 `run_bronze_to_silver_spark(..., api_key=secret)`. The key is used on the driver
-and is neither broadcast nor written to output metadata. API mode without a
-key fails closed.
+and is neither broadcast nor written to output metadata. The shared adapter
+sends only the global residual token/count vocabulary through the Responses
+API with the pinned `gpt-4o-mini-2024-07-18` snapshot, strict Structured
+Outputs, `store: false`, bounded retries, and complete-response validation.
+Returned labels are recorded as review candidates with non-secret provenance;
+API mode without a key or with partial/invalid output fails closed.
 
 Use a Databricks Runtime or ML Runtime whose built-in Python, Arrow, Spark, and
 PyTorch versions match the selected workload. Install this repository's

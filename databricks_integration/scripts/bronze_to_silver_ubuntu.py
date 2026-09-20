@@ -157,6 +157,10 @@ def run_bronze_to_silver(
     residual_policy: str = "manual_review",
     maximum_nonword_token_rate: float = 0.25,
     api_key: str | None = None,
+    residual_api_model: str = "gpt-4o-mini-2024-07-18",
+    residual_api_batch_size: int = 500,
+    residual_api_timeout_seconds: float = 120.0,
+    residual_api_max_retries: int = 2,
     sentiment_mode: str = "vader",
     transformer_model: str = "cardiffnlp/twitter-roberta-base-sentiment-latest",
     transformer_revision: str = "3216a57f2a0d9c45a2e6c20157c20c49fb4bf9c7",
@@ -190,6 +194,10 @@ def run_bronze_to_silver(
         residual_policy=residual_policy,
         maximum_nonword_token_rate=maximum_nonword_token_rate,
         api_key=api_key or os.getenv("OPENAI_API_KEY"),
+        residual_api_model=residual_api_model,
+        residual_api_batch_size=residual_api_batch_size,
+        residual_api_timeout_seconds=residual_api_timeout_seconds,
+        residual_api_max_retries=residual_api_max_retries,
         sentiment_mode=sentiment_mode,
         transformer_model=transformer_model,
         transformer_revision=transformer_revision,
@@ -552,6 +560,7 @@ def build_residual_labels_from_counts(
     policy: str,
     api_key: str | None = None,
     api_options: Mapping[str, Any] | None = None,
+    api_provenance: dict[str, Any] | None = None,
 ) -> tuple[dict[str, str], dict[str, str]]:
     """Resolve one global vocabulary; API calls occur only on the driver."""
     from pipeline.residual_stage import _classify_residual_words_api, _reviewed_labels
@@ -570,14 +579,13 @@ def build_residual_labels_from_counts(
     if not api_key:
         raise ValueError("residual policy 'api' requires an API key")
     api_labels = _classify_residual_words_api(
-        words, normalized_counts, api_key=api_key, **dict(api_options or {})
+        words,
+        normalized_counts,
+        api_key=api_key,
+        provenance=api_provenance,
+        **dict(api_options or {}),
     )
-    missing = [word for word in words if word not in api_labels]
-    fallback = _reviewed_labels(missing)
-    labels = {**fallback, **api_labels}
-    sources = {word: "reviewed_fallback" for word in fallback}
-    sources.update({word: "api" for word in api_labels})
-    return labels, sources
+    return api_labels, {word: "api_candidate" for word in api_labels}
 
 
 def collect_global_residual_labels(
@@ -610,16 +618,24 @@ def collect_global_residual_labels(
             f"limit is {maximum_vocabulary:,}"
         )
     counts = {row["word"]: int(row["count"]) for row in counts_df.collect()}
+    api_provenance: dict[str, Any] = {}
     labels, sources = build_residual_labels_from_counts(
-        counts, policy=policy, api_key=api_key, api_options=api_options
+        counts,
+        policy=policy,
+        api_key=api_key,
+        api_options=api_options,
+        api_provenance=api_provenance,
     )
     source_counts = Counter(sources.values())
-    return labels, {
+    metadata = {
         "policy": policy,
         "vocabulary_size": vocabulary_size,
         "labeled_terms": len(labels),
         "sources": dict(sorted(source_counts.items())),
     }
+    if api_provenance:
+        metadata["api_provenance"] = api_provenance
+    return labels, metadata
 
 
 def fit_global_topic_model_spark(
@@ -1380,6 +1396,12 @@ def run_bronze_to_silver_spark(
             policy=cfg.residual_policy,
             api_key=resolved_key,
             maximum_vocabulary=maximum_residual_vocabulary,
+            api_options={
+                "model": cfg.residual_api_model,
+                "batch_size": cfg.residual_api_batch_size,
+                "timeout": cfg.residual_api_timeout_seconds,
+                "max_retries": cfg.residual_api_max_retries,
+            },
         )
         append_stage_metric(
             run_metrics,
@@ -1567,6 +1589,10 @@ def _build_config(args) -> PipelineConfig:
     return PipelineConfig(
         residual_policy=args.residual_policy,
         maximum_nonword_token_rate=args.maximum_nonword_token_rate,
+        residual_api_model=args.residual_api_model,
+        residual_api_batch_size=args.residual_api_batch_size,
+        residual_api_timeout_seconds=args.residual_api_timeout_seconds,
+        residual_api_max_retries=args.residual_api_max_retries,
         sentiment_mode=args.sentiment,
         transformer_model=args.transformer_model,
         transformer_revision=args.transformer_revision,
@@ -1617,6 +1643,12 @@ def main() -> None:
     parser.add_argument("--sample-seed", type=int, default=0)
     parser.add_argument("--residual-policy", choices=("manual_review", "reviewed", "api"), default="manual_review")
     parser.add_argument("--maximum-nonword-token-rate", type=float, default=0.25)
+    parser.add_argument(
+        "--residual-api-model", default="gpt-4o-mini-2024-07-18"
+    )
+    parser.add_argument("--residual-api-batch-size", type=int, default=500)
+    parser.add_argument("--residual-api-timeout-seconds", type=float, default=120.0)
+    parser.add_argument("--residual-api-max-retries", type=int, default=2)
     parser.add_argument("--sentiment", choices=("none", "vader", "transformer", "both"), default="vader")
     parser.add_argument("--transformer-model", default="cardiffnlp/twitter-roberta-base-sentiment-latest")
     parser.add_argument("--transformer-revision", default="3216a57f2a0d9c45a2e6c20157c20c49fb4bf9c7")

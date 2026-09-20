@@ -56,6 +56,9 @@ def append_run_audit(
         "advanced_nlp_provenance": _json_safe(
             df.attrs.get("advanced_nlp_provenance", {})
         ),
+        "residual_api_provenance": _json_safe(
+            df.attrs.get("residual_api_provenance", {})
+        ),
         "topic_model_metadata": _json_safe(df.attrs.get("topic_model_metadata", {})),
         "sample_provenance": _json_safe(df.attrs.get("sample_provenance", {})),
         "gold_provenance": _json_safe(df.attrs.get("gold_provenance", {})),

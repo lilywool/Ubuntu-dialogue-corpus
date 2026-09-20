@@ -160,6 +160,16 @@ compute. The silver-to-gold job then produces any of these grains:
 `conversation`, `user`, `date`, `channel`, `release`, `language`,
 `residual`, `technical`, `topic`, `entity`, or seeded `sample`.
 
+Optional residual API classification is shared by local and Databricks runs.
+It sends only unique residual tokens and counts—not dialogue rows—to OpenAI's
+Responses API, using the pinned `gpt-4o-mini-2024-07-18` snapshot, a strict JSON
+schema, `store: false`, bounded retries, and fail-closed response validation.
+Labels are identified as API-generated review candidates; non-secret request
+hashes, response IDs, model, and schema version are retained for provenance.
+Local runs read `OPENAI_API_KEY` from the environment. Databricks should inject
+the same variable from a secret scope; the key is never sent to Spark workers
+or written to audit metadata.
+
 ```text
 python -m databricks_integration.scripts.bronze_to_silver_ubuntu \
   --input-table catalog.schema.bronze_ubuntu_dialogue \

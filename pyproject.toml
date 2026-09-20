@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ubuntu-dialogue-pipeline"
-version = "0.1.2"
+version = "0.1.3"
 description = "Validated local and Databricks NLP pipeline for the Ubuntu Dialogue Corpus"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"

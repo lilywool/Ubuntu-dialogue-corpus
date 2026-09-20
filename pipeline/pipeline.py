@@ -17,6 +17,10 @@ class PipelineConfig:
     residual_policy: str = "manual_review"
     maximum_nonword_token_rate: float = 0.25
     api_key: Optional[str] = None
+    residual_api_model: str = "gpt-4o-mini-2024-07-18"
+    residual_api_batch_size: int = 500
+    residual_api_timeout_seconds: float = 120.0
+    residual_api_max_retries: int = 2
     sentiment_mode: str = "vader"
     transformer_model: str = "cardiffnlp/twitter-roberta-base-sentiment-latest"
     transformer_revision: str = "3216a57f2a0d9c45a2e6c20157c20c49fb4bf9c7"
@@ -133,7 +137,12 @@ def run_pipeline(
         policy=cfg.residual_policy,
         api_key=api_key,
         text_col=text_col,
+        model=cfg.residual_api_model,
+        batch_size=cfg.residual_api_batch_size,
+        timeout=cfg.residual_api_timeout_seconds,
+        max_retries=cfg.residual_api_max_retries,
     )
+    residual_api_metadata = dict(df.attrs.get("residual_api_provenance", {}))
 
     residual_output = Path(cfg.output_dir) / "residual_words_for_review.csv"
     residual_output.parent.mkdir(parents=True, exist_ok=True)
@@ -219,6 +228,7 @@ def run_pipeline(
     df.attrs["residual_counts"] = residual_counts
     df.attrs["residual_labels"] = residual_labels
     df.attrs["residual_sources"] = residual_sources
+    df.attrs["residual_api_provenance"] = residual_api_metadata
     df.attrs["residual_output"] = str(residual_output)
     df.attrs["parallel_workers"] = workers
     df.attrs["sample_provenance"] = sample_provenance
@@ -262,6 +272,14 @@ def main() -> None:
         default=0.25,
         help="Fail reviewed/API runs when NONWORD exceeds this token share.",
     )
+    parser.add_argument(
+        "--residual-api-model",
+        default="gpt-4o-mini-2024-07-18",
+        help="Pinned OpenAI model snapshot used only with --residual-policy api.",
+    )
+    parser.add_argument("--residual-api-batch-size", type=int, default=500)
+    parser.add_argument("--residual-api-timeout-seconds", type=float, default=120.0)
+    parser.add_argument("--residual-api-max-retries", type=int, default=2)
     parser.add_argument(
         "--transformer-dtype",
         choices=("float32", "float16", "bfloat16"),
@@ -327,6 +345,10 @@ def main() -> None:
     config = PipelineConfig(
         residual_policy=args.residual_policy,
         maximum_nonword_token_rate=args.maximum_nonword_token_rate,
+        residual_api_model=args.residual_api_model,
+        residual_api_batch_size=args.residual_api_batch_size,
+        residual_api_timeout_seconds=args.residual_api_timeout_seconds,
+        residual_api_max_retries=args.residual_api_max_retries,
         sentiment_mode=args.sentiment,
         transformer_model=args.transformer_model,
         transformer_revision=args.transformer_revision,
