@@ -20,9 +20,12 @@ Kaggle CSV
   -> notebook analysis + Streamlit dashboard
 ```
 
-The local pipeline and Spark/Delta bronze-to-silver-to-gold implementation are
-built. A live Databricks workspace run, deployment configuration, and the
-PowerPoint presentation remain forthcoming.
+Both execution paths are functional. The local pipeline has completed its
+CPU/VADER and OpenAI API canaries, while Databricks Free Edition has ingested
+the full 9,212,877-row Bronze dataset and completed validated 10,000-row
+Silver and conversation-level Gold jobs with audit and performance metrics.
+Transformer testing remains pending both locally and in a scaled Databricks
+pipeline. The PowerPoint presentation is also forthcoming.
 
 ## Quick start
 
@@ -168,7 +171,10 @@ Labels are identified as API-generated review candidates; non-secret request
 hashes, response IDs, model, and schema version are retained for provenance.
 Local runs read `OPENAI_API_KEY` from the environment. Databricks should inject
 the same variable from a secret scope; the key is never sent to Spark workers
-or written to audit metadata.
+or written to audit metadata. A local API canary has verified request handling,
+provenance, validation, and numeric-token preservation. The same classifier is
+used by the Databricks adapter, although its secret-backed execution remains to
+be verified in a Databricks job.
 
 ```text
 python -m databricks_integration.scripts.bronze_to_silver_ubuntu \
@@ -180,9 +186,11 @@ python -m databricks_integration.scripts.bronze_to_silver_ubuntu \
 ```
 
 Partition transformations have deterministic local parity coverage. Live
-Bronze ingestion and a reviewed/VADER Silver smoke test have been verified in
-Databricks Free Edition; the complete Silver/Gold production run remains to be
-validated on its selected runtime and job configuration. See
+Bronze ingestion, reviewed/VADER Silver processing, conversation-level Gold
+aggregation, validation, auditing, and run-metrics collection have been
+verified in Databricks Free Edition, including a 10,000-row scheduled job.
+Full-corpus Silver/Gold and transformer workloads remain to be validated on
+the selected production runtime and cluster configuration. See
 [databricks_integration/README.md](databricks_integration/README.md) for the
 full execution contract.
 
@@ -204,9 +212,10 @@ Run all tests with:
 
 ## Next steps
 
-- validate a small real-data slice on the selected Databricks runtime;
-- add an Asset Bundle after the cloud and cluster shape are known;
-- run the controlled GPU dtype and full-corpus transformer jobs; and
+- validate transformer sentiment and emotion on deterministic local samples;
+- run scaled transformer workloads on a suitable Databricks GPU runtime;
+- verify secret-backed residual API classification in a Databricks job;
+- add an Asset Bundle after the production cluster shape is selected; and
 - publish the PowerPoint presentation.
 
 ## Attribution and license
