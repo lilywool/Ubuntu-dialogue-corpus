@@ -113,6 +113,7 @@ def run_bronze_to_silver(
     text_col: str = "text_cleaned",
     source_text_col: str = "text",
     residual_policy: str = "manual_review",
+    maximum_nonword_token_rate: float = 0.25,
     api_key: str | None = None,
     sentiment_mode: str = "vader",
     transformer_model: str = "cardiffnlp/twitter-roberta-base-sentiment-latest",
@@ -145,6 +146,7 @@ def run_bronze_to_silver(
     """Keep the original local adapter for notebooks and local parity tests."""
     config = PipelineConfig(
         residual_policy=residual_policy,
+        maximum_nonword_token_rate=maximum_nonword_token_rate,
         api_key=api_key or os.getenv("OPENAI_API_KEY"),
         sentiment_mode=sentiment_mode,
         transformer_model=transformer_model,
@@ -968,6 +970,49 @@ def validate_silver_spark(
     if text_col in silver_df.columns and silver_df.where(F.col(text_col).isNull()).limit(1).count():
         failures.append("cleaned text contains null values")
 
+    nonword_token_rate = None
+    nonword_tokens = None
+    lexical_tokens = None
+    if (
+        config.residual_policy in {"reviewed", "api"}
+        and text_col in silver_df.columns
+    ):
+        if (
+            config.maximum_nonword_token_rate < 0
+            or config.maximum_nonword_token_rate > 1
+        ):
+            raise ValueError("maximum_nonword_token_rate must be between 0 and 1")
+        normalized_text = F.trim(F.regexp_replace(
+            F.coalesce(F.col(text_col), F.lit("")),
+            r"[^\p{L}\p{N}_'-]+",
+            " ",
+        ))
+        tokens = F.when(
+            F.length(normalized_text) == 0,
+            F.array().cast("array<string>"),
+        ).otherwise(F.split(normalized_text, r"\s+"))
+        token_stats = silver_df.select(tokens.alias("tokens")).agg(
+            F.sum(F.size("tokens")).alias("lexical_tokens"),
+            F.sum(F.size(F.filter(
+                F.col("tokens"),
+                lambda token: F.upper(token) == F.lit("NONWORD"),
+            ))).alias("nonword_tokens"),
+        ).first()
+        lexical_tokens = int(token_stats["lexical_tokens"] or 0)
+        nonword_tokens = int(token_stats["nonword_tokens"] or 0)
+        nonword_token_rate = (
+            nonword_tokens / lexical_tokens if lexical_tokens else 0.0
+        )
+        if (
+            lexical_tokens >= 100
+            and nonword_token_rate > config.maximum_nonword_token_rate
+        ):
+            failures.append(
+                "NONWORD token rate "
+                f"{nonword_token_rate:.3%} exceeds configured maximum "
+                f"{config.maximum_nonword_token_rate:.3%}"
+            )
+
     for matches, count in (
         ("tech_lexicon_matches", "tech_lexicon_match_count"),
         ("slang_matches", "slang_match_count"),
@@ -1160,6 +1205,9 @@ def validate_silver_spark(
         "rows": rows,
         "columns": len(silver_df.columns),
         "feature_schema_version": FEATURE_SCHEMA_VERSION,
+        "lexical_tokens": lexical_tokens,
+        "nonword_tokens": nonword_tokens,
+        "nonword_token_rate": nonword_token_rate,
         "vader_score_unique": vader_unique_scores,
         "transformer_score_unique": transformer_unique_scores,
         "spacy_nonempty_coverage": spacy_coverage,
@@ -1366,6 +1414,7 @@ def append_silver_audit_delta(
 def _build_config(args) -> PipelineConfig:
     return PipelineConfig(
         residual_policy=args.residual_policy,
+        maximum_nonword_token_rate=args.maximum_nonword_token_rate,
         sentiment_mode=args.sentiment,
         transformer_model=args.transformer_model,
         transformer_revision=args.transformer_revision,
@@ -1414,6 +1463,7 @@ def main() -> None:
     parser.add_argument("--sample-size", type=int)
     parser.add_argument("--sample-seed", type=int, default=0)
     parser.add_argument("--residual-policy", choices=("manual_review", "reviewed", "api"), default="manual_review")
+    parser.add_argument("--maximum-nonword-token-rate", type=float, default=0.25)
     parser.add_argument("--sentiment", choices=("none", "vader", "transformer", "both"), default="vader")
     parser.add_argument("--transformer-model", default="cardiffnlp/twitter-roberta-base-sentiment-latest")
     parser.add_argument("--transformer-revision", default="3216a57f2a0d9c45a2e6c20157c20c49fb4bf9c7")

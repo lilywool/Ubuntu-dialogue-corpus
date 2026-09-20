@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 import pandas as pd
@@ -22,6 +23,20 @@ _PLACEHOLDER_COUNTS = {
     "MENUPATH": "menu_path_count",
     "KEYBOARDSHORTCUT": "keyboard_shortcut_count",
 }
+_LEXICAL_TOKEN_RE = re.compile(r"[^\W]+(?:['-][^\W]+)*", re.UNICODE)
+_MIN_TOKENS_FOR_NONWORD_RATE = 100
+
+
+def _nonword_token_metrics(text: pd.Series) -> tuple[int, int, float]:
+    """Count lexical tokens and explicit NONWORD placeholders."""
+    token_count = 0
+    nonword_count = 0
+    for value in text.fillna("").astype(str):
+        tokens = _LEXICAL_TOKEN_RE.findall(value)
+        token_count += len(tokens)
+        nonword_count += sum(token.upper() == "NONWORD" for token in tokens)
+    rate = nonword_count / token_count if token_count else 0.0
+    return token_count, nonword_count, rate
 
 
 def validate_core_pipeline(
@@ -30,6 +45,7 @@ def validate_core_pipeline(
     text_col: str = "text_cleaned",
     expected_rows: int | None = None,
     expected_index: pd.Index | None = None,
+    maximum_nonword_token_rate: float | None = None,
 ) -> dict[str, Any]:
     """Fail on row drift, stale counts, or inconsistent match flags."""
     failures: list[str] = []
@@ -44,6 +60,26 @@ def validate_core_pipeline(
         failures.append(f"missing cleaned text column: {text_col}")
     elif df[text_col].isna().any():
         failures.append("cleaned text contains null values")
+
+    nonword_token_rate = None
+    if maximum_nonword_token_rate is not None:
+        if maximum_nonword_token_rate < 0 or maximum_nonword_token_rate > 1:
+            raise ValueError("maximum_nonword_token_rate must be between 0 and 1")
+        if text_col in df:
+            lexical_tokens, nonword_tokens, nonword_token_rate = (
+                _nonword_token_metrics(df[text_col])
+            )
+            metrics["lexical_tokens"] = lexical_tokens
+            metrics["nonword_tokens"] = nonword_tokens
+            if (
+                lexical_tokens >= _MIN_TOKENS_FOR_NONWORD_RATE
+                and nonword_token_rate > maximum_nonword_token_rate
+            ):
+                failures.append(
+                    "NONWORD token rate "
+                    f"{nonword_token_rate:.3%} exceeds configured maximum "
+                    f"{maximum_nonword_token_rate:.3%}"
+                )
 
     for matches_column, count_column in _MATCH_COUNT_PAIRS:
         missing = [column for column in (matches_column, count_column) if column not in df]
@@ -107,6 +143,7 @@ def validate_core_pipeline(
         int(df["has_lexicon_match"].sum()) if "has_lexicon_match" in df else None
     )
     metrics["residual_rows"] = int(df["has_residual"].sum()) if "has_residual" in df else None
+    metrics["nonword_token_rate"] = nonword_token_rate
     metrics["passed"] = not failures
     metrics["failures"] = failures
     if failures:

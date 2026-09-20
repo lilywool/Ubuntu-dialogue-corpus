@@ -8,19 +8,24 @@ the original residual list remains available for review or downstream use.
 
 from __future__ import annotations
 
-import re
+import csv
 import hashlib
 import json
 import os
+import re
 import urllib.request
 from collections import Counter
+from functools import lru_cache
+from pathlib import Path
 from typing import Iterable
 
 import pandas as pd
 
 from pipeline.parallel_execution import map_rows
 
-_TOKEN_RE = re.compile(r"[A-Za-z0-9_]+(?:['-][A-Za-z0-9_]+)*")
+# Unicode-aware and underscore-preserving: keeps accented words and the
+# pipeline's underscore-delimited placeholder labels intact.
+_TOKEN_RE = re.compile(r"[^\W]+(?:['-][^\W]+)*", re.UNICODE)
 _LABELS = frozenset({
     "JARGON", "NONWORD", "UNCERTAIN", "SPANISH", "PORTUGUESE", "FRENCH",
     "GERMAN", "ITALIAN", "DUTCH", "JAPANESE", "HAN_CHINESE_JAPANESE_KANJI",
@@ -35,6 +40,44 @@ _STRUCTURAL_PLACEHOLDERS = frozenset({
 _RESERVED_TOKENS_LOWER = frozenset(
     token.lower() for token in (_LABELS | _STRUCTURAL_PLACEHOLDERS)
 )
+_spellchecker = None
+
+
+def _known_english_words(words: Iterable[str]) -> set[str]:
+    """Return exact dictionary hits from the pinned English spellchecker."""
+    global _spellchecker
+    vocabulary = {str(word).lower() for word in words if str(word)}
+    if not vocabulary:
+        return set()
+    if _spellchecker is None:
+        try:
+            from spellchecker import SpellChecker
+        except ImportError as exc:
+            raise ImportError(
+                "English residual filtering requires pyspellchecker from "
+                "the project requirements"
+            ) from exc
+        _spellchecker = SpellChecker()
+    return {str(word).lower() for word in _spellchecker.known(vocabulary)}
+
+
+@lru_cache(maxsize=1)
+def _reviewed_nonword_terms() -> frozenset[str]:
+    """Load only the terms explicitly committed to the NONWORD overlay."""
+    path = (
+        Path(__file__).parent.parent
+        / "reviewed_overlays"
+        / "still_unclassified_defaults_to_NONWORD.csv"
+    )
+    with path.open(newline="", encoding="utf-8-sig") as handle:
+        reader = csv.DictReader(handle)
+        if not reader.fieldnames or "word" not in reader.fieldnames:
+            raise ValueError(f"reviewed NONWORD overlay has no 'word' column: {path}")
+        return frozenset(
+            str(row["word"]).strip().lower()
+            for row in reader
+            if row.get("word") and str(row["word"]).strip()
+        )
 
 
 def _matched_words(row: pd.Series) -> set[str]:
@@ -52,8 +95,8 @@ def _matched_words(row: pd.Series) -> set[str]:
     return known
 
 
-def _extract_row_residuals(values: tuple) -> list[str]:
-    """Return unresolved tokens for one row.
+def _extract_row_candidates(values: tuple) -> list[str]:
+    """Return unmatched candidate tokens for one row.
 
     This worker stays at module scope so ``ProcessPoolExecutor`` can import it
     on Windows. All multi-process execution is delegated to
@@ -97,7 +140,17 @@ def extract_residual_vocabulary(
         raise KeyError(f"residual extraction requires columns: {missing}")
 
     rows = df[[text_col, *match_columns]].itertuples(index=False, name=None)
-    residuals = map_rows(_extract_row_residuals, rows, workers=workers)
+    candidates = map_rows(_extract_row_candidates, rows, workers=workers)
+    known_english = _known_english_words(
+        token for row_candidates in candidates for token in row_candidates
+    )
+    residuals = [
+        [
+            token for token in row_candidates
+            if token.lower() not in known_english
+        ]
+        for row_candidates in candidates
+    ]
     counts = Counter(
         token.lower()
         for row_residuals in residuals
@@ -164,17 +217,21 @@ def _reviewed_labels(words: Iterable[str]) -> dict[str, str]:
     """Resolve words with the committed human-reviewed fallback tables."""
     from reviewed_overlays.residual_classification import JARGON_TERMS, LANGUAGE_LABELS
 
+    normalized_words = [str(word).lower() for word in words]
     language_labels = {word.lower(): label for word, label in LANGUAGE_LABELS.items()}
+    reviewed_nonwords = _reviewed_nonword_terms()
+    known_english = _known_english_words(normalized_words)
     labels = {}
-    for word in words:
-        normalized = str(word).lower()
+    for normalized in normalized_words:
         if normalized in JARGON_TERMS:
             labels[normalized] = "JARGON"
         elif normalized in language_labels:
             labels[normalized] = language_labels[normalized]
         elif normalized.isdigit():
             labels[normalized] = "UNCERTAIN"
-        else:
+        elif normalized in known_english:
+            continue
+        elif normalized in reviewed_nonwords:
             labels[normalized] = "NONWORD"
     return labels
 

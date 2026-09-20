@@ -60,35 +60,60 @@ class ResidualStageTests(unittest.TestCase):
         )
 
     def test_reserved_labels_and_structural_placeholders_are_not_residuals(self):
-        frame = _residual_frame("EMAILADDRESS SPANISH NONWORD mystery")
+        frame = _residual_frame(
+            "EMAILADDRESS SPANISH NONWORD unrecognizedfixturetoken"
+        )
 
         result, counts = extract_residual_vocabulary(frame)
 
-        self.assertEqual(result.loc[0, "residual_words"], ["mystery"])
-        self.assertEqual(counts, Counter({"mystery": 1}))
+        self.assertEqual(
+            result.loc[0, "residual_words"], ["unrecognizedfixturetoken"]
+        )
+        self.assertEqual(counts, Counter({"unrecognizedfixturetoken": 1}))
 
     def test_multiword_known_match_excludes_each_component(self):
-        frame = _residual_frame("video card mystery")
+        frame = _residual_frame("video card unrecognizedfixturetoken")
         frame.at[0, "tech_lexicon_matches"] = [("video card", "hardware")]
 
         _, counts = extract_residual_vocabulary(frame)
 
-        self.assertEqual(counts, Counter({"mystery": 1}))
+        self.assertEqual(counts, Counter({"unrecognizedfixturetoken": 1}))
 
     def test_parallel_residual_extraction_uses_shared_backend(self):
         frame = pd.concat(
-            [_residual_frame("first mystery"), _residual_frame("second mystery")],
+            [
+                _residual_frame("firstfixturetoken sharedfixturetoken"),
+                _residual_frame("secondfixturetoken sharedfixturetoken"),
+            ],
             ignore_index=True,
         )
 
         result, counts = extract_residual_vocabulary(frame, workers=2)
 
-        self.assertEqual(result.loc[0, "residual_words"], ["first", "mystery"])
-        self.assertEqual(result.loc[1, "residual_words"], ["second", "mystery"])
+        self.assertEqual(
+            result.loc[0, "residual_words"],
+            ["firstfixturetoken", "sharedfixturetoken"],
+        )
+        self.assertEqual(
+            result.loc[1, "residual_words"],
+            ["secondfixturetoken", "sharedfixturetoken"],
+        )
         self.assertEqual(
             counts,
-            Counter({"mystery": 2, "first": 1, "second": 1}),
+            Counter({
+                "sharedfixturetoken": 2,
+                "firstfixturetoken": 1,
+                "secondfixturetoken": 1,
+            }),
         )
+
+    def test_known_english_is_not_sent_to_residual_classification(self):
+        frame = _residual_frame("the delete command works thanks")
+
+        result, counts = extract_residual_vocabulary(frame)
+
+        self.assertEqual(result.loc[0, "residual_words"], [])
+        self.assertEqual(counts, Counter())
 
     def test_manual_review_policy_does_not_mutate_text(self):
         frame = _residual_frame("mystery")
@@ -125,17 +150,64 @@ class ResidualStageTests(unittest.TestCase):
             )
 
     def test_reviewed_policy_applies_language_and_nonword_labels(self):
-        frame = _residual_frame("hola mystery")
+        frame = _residual_frame("hola res unrecognizedfixturetoken")
 
         result, labels, sources = classify_residuals(
             frame,
-            Counter({"hola": 1, "mystery": 1}),
+            Counter({"hola": 1, "res": 1, "unrecognizedfixturetoken": 1}),
             policy="reviewed",
         )
 
-        self.assertEqual(result.loc[0, "text_cleaned"], "SPANISH NONWORD")
-        self.assertEqual(labels, {"hola": "SPANISH", "mystery": "NONWORD"})
-        self.assertEqual(sources, {"hola": "reviewed", "mystery": "reviewed"})
+        self.assertEqual(
+            result.loc[0, "text_cleaned"],
+            "SPANISH NONWORD unrecognizedfixturetoken",
+        )
+        self.assertEqual(labels, {"hola": "SPANISH", "res": "NONWORD"})
+        self.assertEqual(sources, {"hola": "reviewed", "res": "reviewed"})
+
+    def test_reviewed_pipeline_rejects_excessive_nonword_replacement(self):
+        frame = pd.DataFrame({
+            "message_id": range(100),
+            "text": ["res"] * 100,
+        })
+
+        with TemporaryDirectory() as output_dir:
+            with self.assertRaisesRegex(AssertionError, "NONWORD token rate"):
+                run_pipeline(
+                    frame,
+                    config=PipelineConfig(
+                        residual_policy="reviewed",
+                        sentiment_mode="none",
+                        parallel=False,
+                        workers=1,
+                        output_dir=output_dir,
+                    ),
+                )
+
+    def test_reviewed_pipeline_preserves_reported_databricks_english(self):
+        texts = [
+            "i'm running my old laptop as a server... haha",
+            "what is the delete command?",
+            "of course that doesnt invalidate it just no experience with it",
+            "thanks",
+        ]
+        frame = pd.DataFrame({"message_id": range(len(texts)), "text": texts})
+
+        with TemporaryDirectory() as output_dir:
+            result = run_pipeline(
+                frame,
+                config=PipelineConfig(
+                    residual_policy="reviewed",
+                    sentiment_mode="none",
+                    parallel=False,
+                    workers=1,
+                    output_dir=output_dir,
+                ),
+            )
+
+        self.assertFalse(result["text_cleaned"].str.contains("NONWORD").any())
+        self.assertIn("delete command", result.loc[1, "text_cleaned"])
+        self.assertEqual(result.loc[3, "text_cleaned"], "thanks")
 
 
 class ParallelExecutionTests(unittest.TestCase):

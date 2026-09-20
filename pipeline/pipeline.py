@@ -15,6 +15,7 @@ import pandas as pd
 @dataclass
 class PipelineConfig:
     residual_policy: str = "manual_review"
+    maximum_nonword_token_rate: float = 0.25
     api_key: Optional[str] = None
     sentiment_mode: str = "vader"
     transformer_model: str = "cardiffnlp/twitter-roberta-base-sentiment-latest"
@@ -197,6 +198,11 @@ def run_pipeline(
         text_col=text_col,
         expected_rows=expected_rows,
         expected_index=expected_index,
+        maximum_nonword_token_rate=(
+            cfg.maximum_nonword_token_rate
+            if cfg.residual_policy in {"reviewed", "api"}
+            else None
+        ),
     )
     validation_stages: dict[str, Any] = {"core": core_validation}
     if "sentiment_validation" in df.attrs:
@@ -249,6 +255,12 @@ def main() -> None:
         "--residual-policy",
         choices=("manual_review", "reviewed", "api"),
         default="manual_review",
+    )
+    parser.add_argument(
+        "--maximum-nonword-token-rate",
+        type=float,
+        default=0.25,
+        help="Fail reviewed/API runs when NONWORD exceeds this token share.",
     )
     parser.add_argument(
         "--transformer-dtype",
@@ -314,6 +326,7 @@ def main() -> None:
     frame = pd.read_csv(args.input_csv)
     config = PipelineConfig(
         residual_policy=args.residual_policy,
+        maximum_nonword_token_rate=args.maximum_nonword_token_rate,
         sentiment_mode=args.sentiment,
         transformer_model=args.transformer_model,
         transformer_revision=args.transformer_revision,

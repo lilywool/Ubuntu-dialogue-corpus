@@ -137,12 +137,13 @@ class DatabricksAdapterPolicyTests(unittest.TestCase):
 
     def test_reviewed_policy_is_deterministic_and_source_labeled(self):
         labels, sources = build_residual_labels_from_counts(
-            {"unrecognizedfixturetoken": 3, "12345": 1},
+            {"res": 3, "unrecognizedfixturetoken": 2, "12345": 1},
             policy="reviewed",
         )
 
-        self.assertEqual(labels["unrecognizedfixturetoken"], "NONWORD")
+        self.assertEqual(labels["res"], "NONWORD")
         self.assertEqual(labels["12345"], "UNCERTAIN")
+        self.assertNotIn("unrecognizedfixturetoken", labels)
         self.assertEqual(set(sources.values()), {"reviewed"})
 
     def test_api_policy_without_key_fails_closed(self):

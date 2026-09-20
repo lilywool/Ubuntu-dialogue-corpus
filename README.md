@@ -88,11 +88,14 @@ The deterministic layer combines:
 - glued-term detection; and
 - thousands of human-reviewed jargon and language decisions.
 
-Residual behavior is explicit. `manual_review` leaves unresolved text
-unchanged, `reviewed` applies the committed human classifications, and
-`api` sends only the bounded residual vocabulary—not full messages—to an
-OpenAI-compatible endpoint. API mode requires a key and never stores it in
-pipeline output.
+Residual behavior is explicit. A pinned English dictionary first removes
+ordinary words from the unresolved vocabulary. `manual_review` leaves the
+remaining terms unchanged, `reviewed` applies only explicit committed human
+classifications, and `api` sends only that bounded residual vocabulary—not
+full messages—to an OpenAI-compatible endpoint. Unreviewed terms are never
+silently converted to `NONWORD`; reviewed/API runs also fail validation if the
+resulting `NONWORD` token rate exceeds the configured ceiling. API mode
+requires a key and never stores it in pipeline output.
 
 Sentiment retains the complete VADER distribution and, when selected, all
 three RoBERTa probabilities plus confidence, expected sentiment, entropy, and
@@ -149,7 +152,7 @@ worker shape, dependencies, model device, and dtype through the job setup. A
 future Declarative Automation Bundle can record separate serverless and classic
 deployment targets without duplicating the processing code.
 
-Whole-job validation precedes the Delta silver write and audit record. The
+Whole-job validation—including the residual `NONWORD` rate—precedes the Delta silver write and audit record. The
 silver-to-gold job then produces any of these grains:
 
 `conversation`, `user`, `date`, `channel`, `release`, `language`,

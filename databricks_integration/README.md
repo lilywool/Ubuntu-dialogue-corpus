@@ -28,8 +28,9 @@ The intended architecture is:
    features.
 3. Run deterministic normalization, anonymization, lexicon matching,
    glued-term matching, and residual extraction in the first `mapInPandas`
-   pass. Each Python partition uses one local worker because Spark supplies the
-   outer parallelism.
+   pass. A pinned English dictionary removes ordinary words before residual
+   classification. Each Python partition uses one local worker because Spark
+   supplies the outer parallelism.
 4. Aggregate the unresolved vocabulary globally with Spark. Leave it untouched
    for `manual_review`, apply the committed overlay for `reviewed`, or classify
    only that bounded vocabulary on the driver for `api`.
@@ -62,8 +63,9 @@ for notebook callers through `release_silver_resources`.
 
 Partition-level deterministic checks run inside the pandas stages. Full-job
 validation runs again after Spark recombines the partitions so missing rows,
-duplicate identifiers, collapsed global distributions, invalid probabilities,
-and inadequate NLP coverage cannot hide behind per-partition success. Both
+duplicate identifiers, excessive `NONWORD` replacement, collapsed global
+distributions, invalid probabilities, and inadequate NLP coverage cannot hide
+behind per-partition success. Both
 silver and gold jobs append to a Delta audit table and record
 `pipeline.schema.FEATURE_SCHEMA_VERSION`.
 `pipeline.schema.FEATURE_SCHEMA_VERSION` is the explicit contract version to
@@ -76,17 +78,18 @@ The residual API call should only happen after the lexical and glued-match passe
 
 If no API key is configured, do not silently run the API and do not convert
 the residual vocabulary to `NONWORD`. The adapter defaults to
-`manual_review`; API mode without a key fails explicitly.
+`manual_review`; API mode without a key fails explicitly. The `reviewed`
+fallback converts only terms explicitly present in the committed NONWORD
+overlay; unseen terms remain unchanged.
 
 ## Verification boundary
 
 The partition transformation has a deterministic small-slice parity test
 against the canonical local VADER pipeline. Both Databricks entry points are
-imported and syntax-checked in the local test suite. A successful live-cluster
-run is intentionally not claimed yet: the target workspace, cloud storage,
-Databricks runtime, worker/GPU shape, and cluster-installed libraries must be
-selected and recorded first. Asset Bundle configuration is optional deployment
-work once those choices are known.
+imported and syntax-checked in the local test suite. A 1,000-row VADER smoke
+test has also been validated on Databricks Free Edition/serverless compute;
+larger classic/GPU runtime choices still need to be selected and recorded.
+Asset Bundle configuration remains optional deployment work.
 
 ## Suggested Delta tables
 
