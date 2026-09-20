@@ -1,3 +1,7 @@
+# Keep text normalization identical across Windows Git, Linux tooling, and
+# Databricks Git folders. Local editors may still choose their display style.
+* text=auto eol=lf
+
 # Required lexicons, reviewed overlays, and small fixtures must remain ordinary
 # Git files so Databricks Git folders can read them without a Git LFS client.
 # Raw and generated corpus CSVs are excluded separately in .gitignore.
