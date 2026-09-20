@@ -6,6 +6,7 @@ Run from the repository root with:
 
 from __future__ import annotations
 
+import base64
 import json
 import os
 import sys
@@ -28,9 +29,13 @@ from pipeline.dashboard import (  # noqa: E402
     preferred_sentiment_column,
 )
 
+ASSETS_DIR = Path(__file__).resolve().parent / "assets"
+UBUNTU_MARK_PATH = ASSETS_DIR / "ubuntu_mark.png"
+UBUNTU_BACKGROUND_PATH = ASSETS_DIR / "ubuntu_bg_tile.png"
+
 st.set_page_config(
     page_title="Ubuntu Dialogue Intelligence",
-    page_icon="💬",
+    page_icon=str(UBUNTU_MARK_PATH),
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -41,6 +46,11 @@ LIGHT_AUBERGINE = "#9B6A8D"
 WARM_GRAY = "#AEA79F"
 PAPER = "#F7F5F2"
 DARK_INK = "#2C2C2C"
+MUTED_INK = "#6F6A64"
+
+_background_tile = base64.b64encode(UBUNTU_BACKGROUND_PATH.read_bytes()).decode(
+    "ascii"
+)
 
 st.markdown(
     f"""
@@ -50,49 +60,106 @@ st.markdown(
         --aubergine: {AUBERGINE};
         --paper: {PAPER};
         --ink: {DARK_INK};
+        --muted: {MUTED_INK};
         --line: #DDD8D2;
     }}
-    .stApp {{ background: var(--paper); color: var(--ink); }}
+    .stApp {{
+        background-color: var(--paper);
+        background-image: url("data:image/png;base64,{_background_tile}");
+        background-repeat: repeat;
+        background-size: 340px 340px;
+        color: var(--ink);
+    }}
     [data-testid="stSidebar"] {{
         background: linear-gradient(180deg, #2C001E 0%, var(--aubergine) 100%);
         border-right: 4px solid var(--ubuntu-orange);
     }}
     [data-testid="stSidebar"] * {{ color: #FFFFFF; }}
-    h1 {{
-        border-left: 10px solid var(--ubuntu-orange);
-        padding-left: 18px;
-        color: var(--aubergine);
-        letter-spacing: .02em;
+    [data-testid="stSidebar"] [data-baseweb="select"] > div {{
+        background: #4B173D;
+        border-color: #9B6A8D;
     }}
-    h2, h3 {{ color: var(--aubergine); }}
+    [data-testid="stMainBlockContainer"] {{
+        padding-top: 60px !important;
+    }}
+    h1 {{
+        border-left: 10px solid var(--ubuntu-orange) !important;
+        padding: 6px 18px !important;
+        color: var(--aubergine);
+        font-weight: 800 !important;
+        letter-spacing: .02em !important;
+        background: rgba(247, 245, 242, .90) !important;
+        border-radius: 0 4px 4px 0 !important;
+        display: inline-block !important;
+        margin-bottom: 24px !important;
+    }}
+    h2, h3 {{
+        color: var(--aubergine);
+        border-left: 6px solid var(--ubuntu-orange) !important;
+        padding: 6px 14px !important;
+        background: rgba(247, 245, 242, .90) !important;
+        border-radius: 0 4px 4px 0 !important;
+        display: inline-block !important;
+    }}
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {{
+        background: none !important;
+    }}
     [data-testid="stMetric"] {{
         background: #FFFFFF;
         border-top: 4px solid var(--ubuntu-orange);
         border-bottom: 1px solid var(--line);
-        border-radius: 6px;
+        border-radius: 4px;
         padding: 14px 16px;
-        box-shadow: 0 2px 8px rgba(44, 0, 30, .06);
+        box-shadow: 0 2px 8px rgba(44, 0, 30, .08);
     }}
-    [data-testid="stDataFrame"], [data-testid="stPlotlyChart"] {{
+    [data-testid="stMetricLabel"] {{ color: var(--muted); }}
+    [data-testid="stMetricValue"] {{
+        color: var(--aubergine);
+        font-weight: 700;
+    }}
+    [data-testid="stDataFrame"],
+    [data-testid="stPlotlyChart"],
+    [data-testid="stExpander"] {{
         background: #FFFFFF;
         border: 1px solid var(--line);
-        border-radius: 6px;
+        border-radius: 4px;
+        overflow: hidden;
     }}
     [data-baseweb="tab-list"] {{
-        background: rgba(255, 255, 255, .75);
+        background: rgba(247, 245, 242, .92);
         border-radius: 6px;
-        padding: 4px;
+        padding: 4px 8px;
     }}
+    button[data-baseweb="tab"] {{ color: var(--muted); }}
     button[data-baseweb="tab"][aria-selected="true"] {{
         color: var(--ubuntu-orange);
         font-weight: 800;
     }}
+    [data-baseweb="tab-highlight"] {{ background: var(--ubuntu-orange); }}
+    .stButton > button, .stDownloadButton > button {{
+        background: var(--ubuntu-orange);
+        border-color: var(--ubuntu-orange);
+        color: #FFFFFF;
+    }}
+    .stButton > button:hover, .stDownloadButton > button:hover {{
+        background: var(--aubergine);
+        border-color: var(--aubergine);
+        color: #FFFFFF;
+    }}
+    [data-testid="stAlertContainer"] {{
+        background: #FFF4EE !important;
+        border: 1px solid var(--ubuntu-orange);
+        border-radius: 4px;
+    }}
     .scope-note {{
-        background: #FFFFFF;
+        background: rgba(255, 255, 255, .94);
         border-left: 5px solid var(--ubuntu-orange);
         padding: 12px 16px;
         border-radius: 4px;
         margin-bottom: 14px;
+        box-shadow: 0 1px 4px rgba(44, 0, 30, .06);
     }}
     </style>
     """,
@@ -179,6 +246,7 @@ sentiment_column = preferred_sentiment_column(conversations)
 # Sidebar drilldowns
 # ---------------------------------------------------------------------------
 
+st.sidebar.image(str(UBUNTU_MARK_PATH), width=72)
 st.sidebar.title("Filters")
 metadata = manifest.get("metadata", {})
 st.sidebar.caption(
