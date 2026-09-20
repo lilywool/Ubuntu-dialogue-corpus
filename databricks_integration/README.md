@@ -215,7 +215,9 @@ and the isolated `mapInPandas` workers. Pointing the task only at the entry
 script is insufficient because Workspace source files are not automatically
 added to each Python worker's import path. The project package includes the
 two CSV assets required at runtime; raw corpus files and generated outputs are
-not packaged.
+not packaged. Increment the project version in `pyproject.toml` whenever this
+worker package changes so a serverless Jobs environment does not reuse a
+cached build.
 
 ## Databricks Spark/Delta silver-to-gold job
 

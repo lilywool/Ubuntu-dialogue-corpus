@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pandas as pd
 
-from pipeline.data_preparation import prepare_text_column
+from pipeline.data_preparation import optimize_dtypes, prepare_text_column
 from pipeline.parallel_execution import recommended_workers
 from pipeline.pipeline import PipelineConfig, run_pipeline
 from pipeline.residual_stage import (
@@ -50,6 +50,32 @@ class DataPreparationTests(unittest.TestCase):
 
         self.assertEqual(result.loc[0, "text_cleaned"], "don't panic")
         self.assertEqual(result.loc[1, "text_cleaned"], "")
+
+    def test_hashed_identifiers_are_not_coerced_to_numeric(self):
+        frame = pd.DataFrame({
+            "conversation_id": ["a" * 64, "b" * 64],
+            "message_id": ["c" * 64, "d" * 64],
+            "folder": ["7", "8"],
+            "turn_count": ["1", "2"],
+        })
+
+        with patch(
+            "pipeline.data_preparation.pd.to_numeric",
+            wraps=pd.to_numeric,
+        ) as converter:
+            result = optimize_dtypes(frame)
+
+        converted_columns = {
+            call.args[0].name
+            for call in converter.call_args_list
+            if getattr(call.args[0], "name", None) is not None
+        }
+        self.assertNotIn("conversation_id", converted_columns)
+        self.assertNotIn("message_id", converted_columns)
+        self.assertEqual(result["conversation_id"].tolist(), ["a" * 64, "b" * 64])
+        self.assertEqual(result["message_id"].tolist(), ["c" * 64, "d" * 64])
+        self.assertTrue(pd.api.types.is_unsigned_integer_dtype(result["folder"]))
+        self.assertTrue(pd.api.types.is_unsigned_integer_dtype(result["turn_count"]))
 
 
 class ResidualStageTests(unittest.TestCase):

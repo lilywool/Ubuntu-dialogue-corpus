@@ -8,10 +8,9 @@ _NUMERIC_COLUMNS = {
     "folder",
     "dialogueID",
     "dialogue_id",
-    "conversation_id",
-    "message_id",
     "turn_count",
 }
+_IDENTIFIER_COLUMNS = {"conversation_id", "message_id"}
 _CATEGORICAL_COLUMNS = {"from", "to"}
 
 
@@ -53,8 +52,19 @@ def optimize_dtypes(df: pd.DataFrame) -> pd.DataFrame:
     untouched rather than guessing their semantic type.
     """
     for column in df.columns:
+        if column in _IDENTIFIER_COLUMNS:
+            # Spark uses SHA-256 hexadecimal strings for these stable IDs.
+            # Never send Arrow-backed identifier columns through to_numeric:
+            # aside from changing their meaning, pandas can crash while
+            # coercing very large string values inside a mapInPandas worker.
+            continue
         if column in _NUMERIC_COLUMNS:
-            numeric = pd.to_numeric(df[column], errors="coerce")
+            source = df[column]
+            numeric = (
+                source
+                if pd.api.types.is_numeric_dtype(source.dtype)
+                else pd.to_numeric(source.astype("object"), errors="coerce")
+            )
             if numeric.notna().all():
                 df[column] = pd.to_numeric(numeric, downcast="unsigned")
         elif column in _CATEGORICAL_COLUMNS:
