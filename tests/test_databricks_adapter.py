@@ -1,4 +1,5 @@
 import ast
+import pickle
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -7,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from databricks_integration.scripts.bronze_to_silver_ubuntu import (
+    _enrichment_iterator,
     _normalize_match_lists,
     _qualified_scratch_table,
     _resolve_materialization_mode,
@@ -21,6 +23,28 @@ from pipeline.pipeline import PipelineConfig, run_pipeline
 
 
 class DatabricksAdapterPolicyTests(unittest.TestCase):
+    def test_serialized_enrichment_callable_contains_no_api_key(self):
+        secret = "sk-fixture-secret-that-must-stay-on-the-driver"
+        transform = _enrichment_iterator(
+            PipelineConfig(api_key=secret, sentiment_mode="none"),
+            residual_payload={},
+            topic_payload=None,
+            text_col="text_cleaned",
+            columns=[],
+        )
+
+        serialized = pickle.dumps(transform)
+        restored = pickle.loads(serialized)
+
+        self.assertNotIn(secret.encode("utf-8"), serialized)
+        self.assertIsNone(restored.keywords["config"].api_key)
+
+    def test_databricks_uses_only_canonical_lexicon_modules(self):
+        duplicate_root = Path("databricks_integration/lexicons")
+
+        self.assertEqual(list(duplicate_root.glob("*.py")), [])
+        self.assertEqual(list(duplicate_root.glob("*.csv")), [])
+
     def test_runtime_csv_inputs_are_not_git_lfs_filtered(self):
         attributes = Path(".gitattributes").read_text(encoding="utf-8")
 

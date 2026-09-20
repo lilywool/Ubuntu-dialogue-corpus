@@ -3,9 +3,9 @@
 This subfolder contains the distributed Databricks implementation of the
 Ubuntu pipeline: Spark-native bronze ingestion and feature preparation, two
 partition-safe `mapInPandas` NLP passes, validated Delta silver output, and
-Spark-native silver-to-gold aggregation. Live workspace verification and an
-optional Asset Bundle remain deployment work; the processing path itself is
-implemented.
+Spark-native silver-to-gold aggregation. Free Edition/serverless verification
+is complete; larger classic/GPU validation and an optional Asset Bundle remain
+deployment work.
 
 The intended architecture is:
 
@@ -16,7 +16,6 @@ The intended architecture is:
 ## Folder layout
 
 - `scripts/` — executable Databricks job code and orchestration steps
-- `lexicons/` — curated lexicon inputs and review references
 - `outputs/` — generated intermediate/final tables and export artifacts
 - `notebooks/` — optional notebook-driven exploration and validation
 
@@ -48,6 +47,8 @@ The intended architecture is:
 
 The only intentional driver collections are the bounded NMF fit sample and the
 unique residual vocabulary; the latter has a configurable maximum-size guard.
+API credentials remain driver-only and are removed from the configuration
+serialized into `mapInPandas` task payloads.
 The full message table is never converted to pandas. Complete probability and
 uncertainty columns are retained rather than reducing transformer output to a
 winning label.

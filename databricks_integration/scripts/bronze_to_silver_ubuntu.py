@@ -21,8 +21,9 @@ import json
 import os
 import re
 from collections import Counter
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from datetime import datetime, timezone
+from functools import partial
 from typing import Any, Iterable, Mapping
 from uuid import uuid4
 
@@ -865,6 +866,39 @@ def _core_iterator(text_col: str, source_text_col: str, columns: list[str]):
     return transform
 
 
+def _transform_enrichment_iterator(
+    iterator: Iterable[pd.DataFrame],
+    *,
+    config: PipelineConfig,
+    residual_payload,
+    topic_payload,
+    text_col: str,
+    columns: list[str],
+):
+    """Run enrichment with an executor-safe, secret-free configuration."""
+    labels = (
+        residual_payload.value
+        if hasattr(residual_payload, "value")
+        else residual_payload or {}
+    )
+    topic_model = (
+        topic_payload.value
+        if hasattr(topic_payload, "value")
+        else topic_payload
+    )
+    for frame in iterator:
+        yield _align_partition_output(
+            transform_enrichment_partition(
+                frame,
+                config=config,
+                residual_labels=labels,
+                topic_model=topic_model,
+                text_col=text_col,
+            ),
+            columns,
+        )
+
+
 def _enrichment_iterator(
     config: PipelineConfig,
     residual_payload,
@@ -872,29 +906,16 @@ def _enrichment_iterator(
     text_col: str,
     columns: list[str],
 ):
-    def transform(iterator: Iterable[pd.DataFrame]):
-        labels = (
-            residual_payload.value
-            if hasattr(residual_payload, "value")
-            else residual_payload or {}
-        )
-        topic_model = (
-            topic_payload.value
-            if hasattr(topic_payload, "value")
-            else topic_payload
-        )
-        for frame in iterator:
-            yield _align_partition_output(
-                transform_enrichment_partition(
-                    frame,
-                    config=config,
-                    residual_labels=labels,
-                    topic_model=topic_model,
-                    text_col=text_col,
-                ),
-                columns,
-            )
-    return transform
+    """Build the callable serialized by Spark without driver-only secrets."""
+    executor_config = replace(config, api_key=None)
+    return partial(
+        _transform_enrichment_iterator,
+        config=executor_config,
+        residual_payload=residual_payload,
+        topic_payload=topic_payload,
+        text_col=text_col,
+        columns=columns,
+    )
 
 
 def _resolve_materialization_mode(mode: str) -> str:
