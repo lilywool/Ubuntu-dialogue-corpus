@@ -1,3 +1,1069 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:7a009ff2a20129ae3d02e9286ac44197d82267b2bd637469343023a6f6e5eb89
-size 89903
+glue,term,count,examples,safe_to_batch_approve
+prefix,config,4260,"['configs', 'configuration', 'configure', 'configureatiojn', 'configured']",False
+prefix,free,4197,"['freenode', 'freenx', 'freeorion', 'freeze', 'freezing']",False
+prefix,driver,3278,"['Drivers', 'driverloader', 'drivers', 'driverse', 'driversw']",False
+prefix,sound,3253,"['soundblaster', 'soundconverter', 'sounding', 'soundkarten', 'sounds']",False
+prefix,edit,2870,"['edited', 'editing', 'editor', 'editors', 'edits']",False
+prefix,user,2766,"['user289584', 'usermod', 'userpassword', 'users', 'userspace']",False
+prefix,package,2686,"['Packages', 'packagemanager', 'packagement', 'packagename', 'packages']",False
+prefix,support,2560,"['supported', 'supporting', 'supportred', 'supportroot', 'supports']",False
+prefix,partition,2552,"['partitioner', 'partitioning', 'partitionning', 'partitions', 'partitionstyle']",False
+prefix,help,2551,"['helpedXD', 'helpful', 'helping', 'helpp', 'helps']",False
+prefix,ubuntu,2475,"['ubuntu0ops', 'ubuntu12', 'ubuntuone', 'ubuntuserver', 'ubuntustudio']",False
+prefix,error,2396,"['Error2', 'error404notfound', 'errorlog', 'errormessage', 'errors']",False
+prefix,list,2344,"['lista', 'listed', 'listen', 'listening', 'lists']",False
+prefix,gnome,2327,"['GNOME3', 'Gnome3', 'gnome2', 'gnome3', 'gnomechat']",False
+prefix,alsa,2303,"['Alsamixer', 'alsaconf', 'alsactl', 'alsamixer', 'alsamixergui']",False
+prefix,make,2300,"['Makes', 'makefile', 'makepkg', 'makers', 'makes']",False
+prefix,program,2186,"['program1', 'program2', 'programmare', 'programms', 'programs']",False
+prefix,line,2068,"['linea', 'lined', 'linenumber', 'liner', 'lines']",False
+prefix,wine,1990,"['WineHQ', 'wine1', 'wineboot', 'winehq', 'winetricks']",False
+prefix,link,1974,"['Linksys', 'linked', 'links', 'links2', 'linksys']",False
+prefix,command,1963,"['Commands', 'commandhere', 'commandl', 'commandline', 'commands']",False
+prefix,quit,1957,"['QUITE', 'quite', 'quiting', 'quits', 'quitstorm']",False
+prefix,boot,1850,"['BOOTLOGD_ENABLE', 'bootinfo', 'bootoption', 'boots', 'bootup']",False
+prefix,download,1809,"['DownloadHelper', 'downloaded', 'downloadig', 'downloading', 'downloadmanger']",False
+prefix,enable,1743,"['EnableFastWrites', 'Enabled', 'enabled', 'enables', 'enablesources']",False
+prefix,print,1688,"['printed', 'printer', 'printerdriver', 'printers', 'printing']",False
+prefix,game,1578,"['GameBoy', 'gamecast', 'gameplay', 'games', 'gameservers']",False
+prefix,wlan,1457,"['WLANO', 'wlan0', 'wlan1', 'wlan2', 'wlans']",False
+prefix,distro,1255,"['DistroJockey', 'Distrojockey', 'Distros', 'distrobution', 'distros']",False
+prefix,server,1232,"['server1', 'server10', 'serveral', 'servername', 'servers']",False
+prefix,apple,1206,"['Applet', 'apples', 'applet', 'appletalk', 'applets']",False
+prefix,disc,1202,"['discografia', 'disconect', 'discovery', 'discs', 'discuss']",False
+prefix,mount,1166,"['mountains', 'mounting', 'mountpoint', 'mountpoints', 'mounts']",False
+prefix,head,1133,"['Headphone', 'headphone', 'headphones', 'headset', 'headsets']",False
+prefix,update,1127,"['UpdateManager', 'Updatemanager', 'updatemanager', 'updater', 'updates']",False
+prefix,install,1100,"['InstallPidgin', 'installaed', 'installe', 'installs', 'installvia']",False
+prefix,module,1032,"['MODULES', 'moduleName', 'module_name', 'modulename', 'modules']",False
+prefix,apache,1024,"['Apache2', 'apache2', 'apache22', 'apachectl', 'apachefriends']",False
+prefix,file,966,"['filemanager', 'filemanagers', 'filepaths', 'filetypes', 'filezilla']",False
+prefix,script,938,"['scripting', 'scriptkiddies', 'scriptname', 'scripts', 'scriptwarlock']",False
+prefix,linux,930,"['linux4u', 'linuxlive', 'linuxmce', 'linuxmint', 'linuxminthelp']",False
+prefix,application,883,"['APPLICATIONS', 'Applications', 'application_name', 'applicationname', 'applications']",False
+prefix,source,876,"['sourcecode', 'sourceforge', 'sourcelist', 'sourcers', 'sources']",False
+prefix,format,857,"['Formatting', 'formating', 'formatstrings', 'formatted', 'formatting']",False
+prefix,computer,843,"['computer12345', 'computerbank', 'computerex', 'computername', 'computers']",False
+prefix,version,817,"['Versions', 'versionchanges', 'versione', 'versioning', 'versions']",False
+prefix,repo,814,"['reponding', 'report', 'reported', 'reporting', 'reports']",False
+prefix,reboot,802,"['Rebooting', 'rebooted', 'rebootin', 'rebooting', 'reboots']",False
+prefix,channel,753,"['channel_nanme', 'channell', 'channelname', 'channelofyourchoice', 'channels']",False
+prefix,java,739,"['Javascript', 'java6', 'java_home', 'javac', 'javascript']",False
+prefix,upgrade,716,"['Upgraded', 'Upgrades', 'upgraded', 'upgrader', 'upgrades']",False
+prefix,port,708,"['porta', 'portueguese', 'portugue', 'portuguese', 'português']",False
+prefix,result,706,"['RESULTS', 'Results', 'result_true', 'resulted', 'results']",False
+prefix,machine,699,"['Machinery', 'Machines', 'machinee', 'machineguns', 'machines']",False
+prefix,kernel,629,"['Kernels', 'kernell', 'kernelnewbies', 'kernels', 'kernelspace']",False
+prefix,synaptic,625,"['Synaptics', 'SynapticsTouchpad', 'synaptice', 'synapticpacket', 'synaptics']",False
+prefix,find,615,"['finde', 'finding', 'findout', 'finds', 'findsmb']",False
+prefix,reinstall,613,"['Reinstalling', 'reinstallation', 'reinstalling', 'reinstalll', 'reinstalls']",False
+prefix,folder,608,"['Folders', 'folder1', 'foldername', 'folders', 'folderview']",False
+prefix,monitor,606,"['Monitors', 'monitored', 'monitoring', 'monitorizing', 'monitors']",False
+prefix,data,580,"['database', 'databases', 'datacd', 'dataloss', 'datasheet']",False
+prefix,icon,575,"['iconfig', 'icons', 'iconset', 'icontheme', 'iconv']",False
+prefix,process,567,"['Processes', 'processed', 'processes', 'processing', 'processname']",False
+prefix,chat,557,"['Chatzilla', 'chatroom', 'chats', 'chatting', 'chatzilla']",False
+prefix,site,553,"['sitecom', 'sitee', 'sitemap', 'sitemapgen', 'sites']",False
+prefix,local,526,"['localc', 'locale', 'localedef', 'locales', 'locality']",False
+prefix,pastebin,522,"['pastebinf', 'pastebinit', 'pastebinned', 'pastebinning', 'pastebins']",False
+prefix,graphic,521,"['Graphical', 'GraphicalTheme', 'graphicaal', 'graphical', 'graphicalley']",False
+prefix,crash,521,"['crash1', 'crashcourse', 'crashdown', 'crashes', 'crashhanddie']",False
+prefix,default,517,"['defaultapp', 'defaulted', 'defaulting', 'defaultly', 'defaults']",False
+prefix,burn,512,"['burnGiants', 'burned', 'burner', 'burners', 'burns']",False
+prefix,opera,507,"['Operation', 'operate', 'operation', 'operations', 'operatives']",False
+prefix,intel,502,"['intelHD', 'intellectually', 'intellegence', 'intelligence', 'intellisense']",False
+prefix,root,492,"['rootirc', 'rootkit', 'rootkitted', 'rootnoobtux', 'rootshell']",False
+prefix,sudo,491,"['sudobash', 'sudoedit', 'sudoer', 'sudoers', 'sudoroot']",False
+prefix,state,475,"['States', 'stated', 'statement', 'statements', 'states']",False
+prefix,admin,463,"['administraitor', 'administrative', 'administrators', 'admins', 'adminship']",False
+prefix,desktop,455,"['DesktopEnvironment', 'desktopUB1004', 'desktopnexus', 'desktopp', 'desktops']",False
+prefix,scroll,453,"['scrollback', 'scrollback_lines', 'scrollbars', 'scrolling', 'scrollwheel']",False
+prefix,connection,445,"['Connections', 'connectionA', 'connectiong', 'connectionmine', 'connections']",False
+prefix,laptop,442,"['LaptopTestingTeam', 'Laptops', 'laptopmode', 'laptops', 'laptopt']",False
+prefix,convert,440,"['ConvertXtoDVD', 'converter', 'converting', 'convertor', 'converts']",False
+prefix,comment,436,"['commentary', 'commented', 'commenting', 'commentory', 'comments']",False
+prefix,dhcp,428,"['DHCPOFFERS', 'dhcpcd', 'dhcpd', 'dhcpdump', 'dhcpoffers']",False
+prefix,clone,410,"['CloneZilla', 'Clonezilla', 'cloned', 'clones', 'clonezilla']",False
+prefix,filesystem,407,"['FileSystemCHeck', 'FileSystemChecK', 'FileSystems', 'Filesystems', 'filesystems']",False
+prefix,return,404,"['returncode', 'returned', 'returning', 'returns', 'returnvalue']",False
+prefix,http,392,"['httpassword', 'httpd', 'httpd2', 'httptrack', 'httptunnel']",False
+prefix,idle,389,"['IdleOne', 'Idleone', 'Idlework', 'idleone', 'idles']",False
+prefix,packet,388,"['packetcollision', 'packetmanager', 'packets', 'packetsniff', 'packetstorm']",False
+prefix,symlink,384,"['Symlinks', 'symlinked', 'symlinkin', 'symlinking', 'symlinks']",False
+prefix,paste,383,"['pastebox', 'pasted', 'pasteeater', 'pasteflooding', 'pastein']",False
+prefix,repos,378,"['repositeries', 'reposition', 'repositionable', 'repost', 'reposting']",False
+prefix,xfce,373,"['XFCE4', 'XFce4', 'Xfcetaskmanager', 'xfce4', 'xfcefreak']",False
+prefix,torrent,371,"['Torrents', 'torrented', 'torrenting', 'torrents', 'torrentz']",False
+prefix,compiz,365,"['CompizConfig', 'CompizConfigSettingsManager', 'CompizFusion', 'compizconfig', 'compize']",False
+prefix,speed,348,"['speedruns', 'speeds', 'speedstep', 'speedtest', 'speedy']",False
+prefix,unmount,347,"['Unmounting', 'unmounted', 'unmounting', 'unmounts', 'unmountu']",False
+prefix,player,341,"['Players', 'player1up', 'playeras', 'playername', 'players']",False
+prefix,copy,332,"['copying', 'copyleft', 'copypastes', 'copyright', 'copyrigth']",False
+prefix,password,328,"['PasswordAuthentication', 'Passwords', 'passworded', 'passwordless', 'passwords']",False
+prefix,filename,318,"['FILENAMEYOUWANT', 'FilenameTypeSize', 'filenameandpath', 'filenamehere', 'filenames']",False
+prefix,system,316,"['System76', 'SystemRescueCD', 'system76', 'systemdisk', 'systemrescuecd']",False
+prefix,bash,315,"['bash_history', 'bash_profile', 'bash_rc', 'bashes', 'bashrc']",False
+prefix,grub,313,"['Grub4dos', 'grub1', 'grub4dos', 'grubing', 'grubs']",False
+prefix,ntfs,303,"['ntfs3g', 'ntfsclone', 'ntfsfix', 'ntfsprogs', 'ntfstools']",False
+prefix,files,296,"['filesfrom', 'filesharing', 'filesize', 'filesizes', 'filesys']",False
+prefix,envy,275,"['Envy24Control', 'envyNB', 'envycore', 'envying', 'envynv']",False
+prefix,automount,266,"['Automounting', 'automounted', 'automounter', 'automounting', 'automounts']",False
+prefix,ping,263,"['Pinguy', 'pinguins', 'pingus', 'pinguy', 'pinguyos']",False
+prefix,window,263,"['WindowManager', 'Windowz', 'windowmaker', 'windowmanager', 'windowzs']",False
+prefix,fglrx,259,"['fglrx_pci', 'fglrx_xgamma', 'fglrxcofig', 'fglrxconfig', 'fglrxinfo']",False
+prefix,panel,249,"['panel2', 'panell', 'panelreset', 'panels', 'panelsettings']",False
+prefix,resolution,242,"['resolutiondisplay', 'resolutioni', 'resolutionis', 'resolutions', 'resolutionyet']",False
+prefix,address,220,"['ADDRESS_OF_AP', 'AddressFamily', 'addressed', 'addresses', 'addressing']",False
+prefix,login,218,"['loginfenster', 'loging', 'loginmanager', 'logins', 'loginscreen']",False
+prefix,locate,216,"['locateD', 'located', 'locatedb', 'locateing', 'locater']",False
+prefix,browser,215,"['Browsers', 'browsers', 'browsershoots', 'browsershots', 'browsertabs']",False
+prefix,mysql,215,"['mysql4', 'mysql_connect', 'mysqladmin', 'mysqld', 'mysqldump']",False
+prefix,router,205,"['RouterName', 'routerbox', 'routerip', 'routers', 'routerside']",False
+prefix,account,201,"['Accounts', 'accountancy', 'accounting', 'accounts', 'accountsservice']",False
+prefix,tutorial,199,"['Tutorials', 'tutorials']",False
+prefix,pull,199,"['Pulldown', 'Pulling', 'pulled', 'pulling', 'pulls']",False
+prefix,output,194,"['outputfile', 'outputfilename', 'outputing', 'outputless', 'outputs']",False
+prefix,display,194,"['DisplayCalibrator', 'displayed', 'displayes', 'displaying', 'displaylink']",False
+prefix,firefox,193,"['Firefoxz', 'firefox3', 'firefox4', 'firefox5', 'firefoxy']",False
+prefix,quake,192,"['QuakeWorld', 'quake2', 'quake3', 'quakeguy', 'quakelive']",False
+prefix,firewall,189,"['Firewalls', 'firewalled', 'firewalling', 'firewalll', 'firewalls']",False
+prefix,terminal,184,"['terminalbased', 'terminalclient', 'terminall', 'terminals', 'terminalvelocity']",False
+prefix,volume,182,"['volumecontrol', 'volumeid', 'volumen', 'volumename', 'volumes']",False
+prefix,website,182,"['Websites', 'websited', 'websites']",False
+prefix,snap,175,"['snapping', 'snappy', 'snapscan', 'snapshot', 'snapshots']",False
+prefix,workspace,166,"['Workspaces', 'workspace1', 'workspace2', 'workspaces', 'workspacesd']",False
+prefix,gimp,160,"['GIMPshop', 'Gimpshop', 'gimpnet', 'gimpshop', 'gimpy1382']",False
+prefix,modem,152,"['ModemData', 'Modems', 'modemData', 'modemmanager', 'modems']",False
+prefix,size,149,"['size_pe_lv', 'sized', 'sizes', 'sizeview', 'sizez']",False
+prefix,screensaver,149,"['Screensavers', 'screensaverlist', 'screensavers']",False
+prefix,memtest,148,"['MemTest86', 'Memtest86', 'memtest86', 'memtest86x', 'memtester']",False
+prefix,cdrom,147,"['CDROMS', 'CDROMs', 'cdromRAdams', 'cdroms', 'cdromupgrade']",False
+prefix,updated,143,"['updatedb', 'updatedd', 'updatedefault', 'updatedefaultentry', 'updateds']",False
+prefix,software,141,"['SoftwarePedia', 'softwarecenter', 'softwarecentre', 'softwarem', 'softwares']",False
+prefix,processor,140,"['Processors', 'processorE2140', 'processors']",False
+prefix,less,136,"['lesser', 'lesshaste', 'lession', 'lesson', 'lessy']",False
+prefix,wifi,136,"['WifiRadar', 'wifi0', 'wificard', 'wifinetwork', 'wifis']",False
+prefix,wireless,133,"['WirelessLAN', 'Wirelessly', 'wirelesscard', 'wirelessly', 'wirelesss']",False
+prefix,card,130,"['Cardapio', 'cardctl', 'carding', 'cardnd', 'cardreader']",False
+prefix,unity,123,"['Unity2D', 'Unity3D', 'Unityt', 'unity3d', 'unitybar']",False
+prefix,shell,122,"['shellinabox', 'shellow', 'shells', 'shellscript', 'shellscripts']",False
+prefix,push,122,"['Pushing', 'pushd', 'pushed', 'pushin', 'pushing']",False
+prefix,sata,118,"['SATA3s', 'sata_via', 'satacdburners', 'satanic', 'satanist']",False
+prefix,nameserver,116,"['Nameservers', 'nameservers']",False
+prefix,windows,114,"['WindowsOS', 'windowsa', 'windowskey', 'windowsraid', 'windowsss']",False
+prefix,beta,111,"['BETA2', 'BETAMINE', 'Beta2', 'beta1', 'beta2']",False
+prefix,page,111,"['pagedown', 'pageeeeeee', 'pagefile', 'pagent', 'pageup']",False
+prefix,ext2,110,"['Ext2Fsd', 'ext2fs', 'ext2ifs', 'ext2ntfs', 'ext2resize']",False
+prefix,keyboard,110,"['Keyboard0', 'KeyboardInterrupt', 'keyboardlayout', 'keyboards', 'keyboardshortcuts']",False
+prefix,mplayer,107,"['mplayer2', 'mplayer32', 'mplayer_mozilla', 'mplayerhq', 'mplayerplug']",False
+prefix,wiki,106,"['WikiLeaks', 'WikidPad', 'wikileaks', 'wikipage', 'wikis']",False
+prefix,xmms,104,"['XMMS2', 'xmms1', 'xmms2', 'xmms_2_', 'xmmsctrl']",False
+prefix,setup,104,"['setupUbuntu', 'setupcon', 'setupguide', 'setups', 'setuptools']",False
+prefix,chmod,103,"['CHMODed', 'chmod777', 'chmodded', 'chmoded', 'chmoding']",False
+prefix,mate,103,"['mater', 'material', 'materialize', 'mates', 'matey']",False
+prefix,grep,102,"['Grephics', 'grepory', 'grepped', 'grepping', 'greps']",False
+prefix,protocol,102,"['Protocol2', 'protocol1', 'protocoll', 'protocolo', 'protocols']",False
+prefix,daemon,99,"['DaemonLee', 'Daemones', 'daemonize', 'daemons', 'daemontools']",False
+prefix,username,94,"['Usernames', 'username1', 'username2', 'usernamehere', 'usernames']",False
+prefix,export,93,"['export2mp3', 'exported', 'exportfs', 'exporting', 'exports']",False
+prefix,which,91,"['Whichever', 'whichc', 'whichcountry', 'whicherver', 'whichever']",False
+prefix,nvidia,90,"['NvidiaGeforce2Go', 'nvidia_bl_dkms', 'nvidia_current', 'nvidiafb', 'nvidias']",False
+prefix,subnet,89,"['subnetmask', 'subnets', 'subnetted', 'subnetting', 'subnetwork']",False
+prefix,cache,87,"['Cached', 'cache_surplus', 'cached', 'cacheing', 'caches']",False
+prefix,livecd,87,"['LiveCDs', 'liveCD5', 'liveCDs', 'livecde', 'livecds']",False
+prefix,radeon,83,"['RadeonHD', 'radeon9000', 'radeon9700', 'radeonhd', 'radeons']",False
+prefix,acer,78,"['acerimmer', 'acerimmer_', 'acero', 'acers', 'aceruser']",False
+prefix,wildcard,77,"['wildcarded', 'wildcarding', 'wildcards']",False
+prefix,dualboot,75,"['dualbooted', 'dualbooting', 'dualboots']",False
+prefix,string,74,"['string1', 'string2', 'stringgreaterthan13characters', 'strings', 'stringy']",False
+prefix,directory,73,"['DirectoryIndex', 'directory1', 'directory2', 'directoryname', 'directorys']",False
+prefix,lamp,72,"['LAMPP', 'lampa', 'lampo', 'lampp', 'lamps']",False
+prefix,64bit,70,"['64bitflash', '64bitness', '64bits', '64bitty', '64bitubuntuftw']",False
+prefix,splash,69,"['splashimage', 'splashote', 'splashscreen', 'splashscreens', 'splashy']",False
+prefix,debian,68,"['DebianLive', 'debianers', 'debianish', 'debianized', 'debians']",False
+prefix,bios,68,"['BIOSes', 'BiosElement', 'bios_version', 'bioses', 'biosupdate']",False
+prefix,vesa,68,"['Vesaworked', 'vesafb', 'vesamenu', 'vesawont']",False
+prefix,thinkpad,64,"['ThinkPads', 'Thinkpads', 'thinkpad_ec', 'thinkpads', 'thinkpaduser']",False
+prefix,automate,64,"['automated', 'automaters', 'automates']",False
+prefix,proxy,63,"['proxychain', 'proxychains', 'proxyman', 'proxys', 'proxyserver']",False
+prefix,object,63,"['Objective', 'objective', 'objectives', 'objectorientated', 'objects']",False
+prefix,echo,63,"['Echosystm', 'echoed', 'echoes', 'echoo', 'echosystm']",False
+prefix,none,62,"['nonefree', 'nones', 'nonesense', 'nonetheles', 'nonetheless']",False
+prefix,dvds,62,"['DVDSHRINK', 'DVDShrink', 'DVDStyler', 'dvdshrink', 'dvdstyler']",False
+prefix,dell,61,"['DellGuy', 'DellLatitudeC400', 'Dellbuntus', 'della', 'dellminiuser']",False
+prefix,device,57,"['Devicekit', 'devicekit', 'devicename', 'devicenode', 'devicers']",False
+prefix,repository,56,"['Repositorys', 'repositoryies', 'repositorys', 'repositoryurl']",False
+prefix,emacs,55,"['emacs21', 'emacs22', 'emacs23', 'emacsonline', 'emacspeak']",False
+prefix,udev,54,"['udevd', 'udevinfo', 'udevmonitor', 'udevplug', 'udevrules']",False
+prefix,precise,53,"['Precisely', 'preciself', 'precisely']",False
+prefix,automatix,53,"['Automatix2', 'Automatixs', 'automatix2']",False
+prefix,global,52,"['globaladvance', 'globally', 'globalmenu', 'globals', 'globaly']",False
+prefix,installer,52,"['installer36', 'installerade', 'installeren', 'installeret', 'installers']",False
+prefix,installation,51,"['Installationskandidaten', 'installationg', 'installations', 'installationskandidat', 'installationwise']",False
+prefix,mobo,49,"['Mobos', 'mobodo', 'mobomanual', 'mobomelter', 'mobos']",False
+prefix,telnet,48,"['TELNETING', 'telnetd', 'telneted', 'telneting', 'telnetting']",False
+prefix,more,47,"['moreeee', 'moreless', 'moreover', 'moreso', 'moreutils']",False
+prefix,nano,46,"['Nanothief', 'nano_', 'nanorc', 'nanotube', 'nanotubes']",False
+prefix,motherboard,45,['motherboards'],False
+prefix,purge,44,"['PurgeEmpathy', 'purged', 'purgegnome', 'purgeing', 'purges']",False
+prefix,dash,43,"['dashavoo', 'dashboard', 'dashboards', 'dashes', 'dashua']",False
+prefix,array,42,"['array2', 'array3', 'array4', 'array6', 'arrays']",False
+prefix,broken,42,"['brokenHDD', 'brokenb', 'brokenbin', 'brokenflash', 'brokenvids']",False
+prefix,lucid,41,"['LucidPerry', 'LucidVisions', 'Luciddb', 'Lucidia', 'lucida']",False
+prefix,ctrl,39,"['CTRLs', 'CtrlAltF7', 'ctrl_alt_f1', 'ctrlalt', 'ctrls']",False
+prefix,gmail,39,"['GMailFS', 'GmailFS', 'gmailaccount', 'gmailfs', 'gmails']",False
+prefix,pulse,39,"['PulseAudia', 'pulseaduio', 'pulseezar', 'pulsesaudio', 'pulseuadio']",False
+prefix,plugin,39,"['plugined', 'pluginfile', 'pluging', 'plugings', 'pluginlaserjet']",False
+prefix,chown,39,"['chownTown', 'chowned', 'chowning', 'chownmount', 'chowns']",False
+prefix,ports,38,"['portscan', 'portscanner', 'portscanners', 'portscanning', 'portsentry']",False
+prefix,commit,36,"['commited', 'commith', 'commiting', 'commits', 'committed']",False
+prefix,azure,34,"['azureal', 'azureous', 'azures', 'azureuas', 'azureues']",False
+prefix,graphics,33,"['GraphicsMagic', 'graphicscard', 'graphicshandler', 'graphicsmagick', 'graphicss']",False
+prefix,howto,32,"['HowtoForge', 'howtobecome133thackz0r', 'howtofix', 'howtoforge', 'howtogeek']",False
+prefix,microsoft,32,"['Microsofts', 'microsoftically', 'microsofts', 'microsofttt', 'microsofty']",False
+prefix,rsync,32,"['rsyncd', 'rsynced', 'rsynch', 'rsyncing', 'rsyncs']",False
+prefix,ndiswrapper,32,"['ndiswrapperblahblah', 'ndiswrapperd', 'ndiswrappered', 'ndiswrapperl', 'ndiswrappers']",False
+prefix,bootloader,31,"['bootloaderr', 'bootloaders']",False
+prefix,vmware,31,"['vmware2', 'vmwareplayer', 'vmwares', 'vmwareserver', 'vmwareworkstation']",False
+prefix,cloud,31,"['CloudBerry', 'CloudMonkee', 'cloudbook', 'clouds', 'cloudyLights']",False
+prefix,xterm,30,"['xterminal', 'xtermrc', 'xterms']",False
+prefix,vector,28,"['vectorbased', 'vectorgraphics', 'vectorizers', 'vectorlinux', 'vectory']",False
+prefix,squid,28,"['squid0', 'squid2', 'squidbulletshighlight', 'squidguard', 'squidly']",False
+prefix,cheese,28,"['CheeseGardener', 'Cheesetracker', 'cheesebo1', 'cheesetracker', 'cheesew']",False
+prefix,dapper,28,"['DapperDrake', 'Dappers', 'dapperandbeprecise', 'dapperdrake', 'dappers']",False
+prefix,breezy,28,"['BreezyUpgrade', 'BreezyUpgradeNotes', 'breezy64', 'breezys', 'breezyupgrade']",False
+prefix,curl,27,"['curley_sue', 'curlftpfs', 'curlftps', 'curly', 'curly_q']",False
+prefix,videocard,26,"['VideoCards', 'Videocard0', 'Videocards', 'videocards']",False
+prefix,launcher,25,"['Launchers', 'launcherlist', 'launchers']",False
+prefix,unetbootin,24,"['Unetbooting', 'unetbootindefault', 'unetbooting', 'unetbootinl', 'unetbootinm']",False
+prefix,adobe,24,"['AdobeAIRINstaller', 'adobeflash', 'adobepdf', 'adobephotoshop', 'adobes']",False
+prefix,compiler,24,"['Compilers', 'compilers', 'compilerwriter']",False
+prefix,powerbook,24,"['PowerBooks', 'Powerbooks', 'powerbookG4', 'powerbooks']",False
+prefix,pidgin,23,"['Pidging', 'pidgin_', 'pidging', 'pidginho', 'pidgins']",False
+prefix,backtrack,23,"['Backtrack4', 'backtrack2', 'backtrack4', 'backtrack5', 'backtracking']",False
+prefix,syntax,23,"['SyntaxError', 'SyntaxError55', 'syntaxerror', 'syntaxerror55', 'syntaxes']",False
+prefix,systems,22,"['systems7', 'systemsettings', 'systemsit', 'systemstart', 'systemstuff']",False
+prefix,ssid,22,"['SSIDNAME', 'SSID_NAME', 'SSIDs', 'ssids']",False
+prefix,gateway,22,"['gateway6', 'gatewaydawg', 'gateways']",False
+prefix,sqlite,20,"['SQLite3', 'Sqlite3', 'sqlite3']",True
+prefix,macbook,20,"['MacBookPro', 'macbookkpro', 'macbookpro', 'macbookpro8']",False
+prefix,amarok,20,"['AMAROKKKKKKKKK', 'Amarok2', 'amarok14', 'amarok2', 'amarokker']",False
+prefix,wget,20,"['wgeting', 'wgetpaste', 'wgetpro', 'wgets', 'wgetting']",False
+prefix,nickserv,20,"['NickServe', 'nickserve', 'nickserved', 'nickserver', 'nickservice']",False
+prefix,vista,20,"['VISTA32', 'VistaUser', 'vista64bit', 'vistas', 'vistauser']",False
+prefix,skype,19,"['Skype_in', 'skypent', 'skypeout', 'skyperecording', 'skypes']",False
+prefix,interface,19,"['INTERFACE_NAME', 'InterfaceLift', 'interfaced', 'interfacelift', 'interfacename']",False
+prefix,fdisk,19,"['fdisked', 'fdisking', 'fdisks', 'fdiskto']",False
+prefix,submit,18,"['SubmitingPatches', 'submited', 'submition', 'submits', 'submitted']",False
+prefix,service,18,"['Servicename', 'serviceconfig', 'servicename', 'servicepack', 'serviceway']",False
+prefix,totem,18,"['TOTEMPLAYER', 'Totemplayer', 'totemmovie', 'totemuse', 'totemxine']",False
+prefix,evolution,17,"['Evolution2', 'EvolutionR', 'evolution2', 'evolutionr', 'evolutions']",False
+prefix,gutsy,17,"['GutsyUser', 'Gutsys', 'gutsy_gorilla', 'gutsys', 'gutsysources']",False
+prefix,offtopic,16,"['offtopice', 'offtopicing', 'offtopicking', 'offtopicness', 'offtopics']",False
+prefix,ext3,15,"['ext3fs', 'ext3grep', 'ext3st']",False
+prefix,openoffice,15,"['OpenOffice3', 'openoffice2', 'openoffice3', 'openoffice31', 'openoffice311']",True
+prefix,edgy,15,"['edgy360', 'edgyeft', 'edgyfinal', 'edgykernel', 'edgys']",False
+prefix,tail,15,"['tailer', 'tailf', 'tailored', 'tails', 'tailsfan']",False
+prefix,hoary,15,"['HoaryHedgehog', 'hoarycripple', 'hoaryfied', 'hoaryfina', 'hoarys']",False
+prefix,bandwidth,15,"['bandwidthd', 'bandwidthread', 'bandwidths', 'bandwidthusage']",False
+prefix,library,15,"['libraryconflict', 'libraryimporting', 'libraryoffice', 'librarys']",False
+prefix,operator,14,['operators'],False
+prefix,installed,14,"['installeds', 'installedthe', 'installedubuntu', 'installedunbutu', 'installedyet']",False
+prefix,thunderbird,13,"['Thunderbird2', 'thunderbird2', 'thunderbird3', 'thunderbirdis', 'thunderbirds']",False
+prefix,netinstall,13,"['netinstaller', 'netinstalling', 'netinstalll', 'netinstalls']",False
+prefix,feisty,13,"['FeistyFawn', 'FeistyLAMP', 'feistyfawn', 'feistynofluff', 'feistyu']",False
+prefix,wubi,12,"['wubi1004', 'wubiguide', 'wubildr', 'wubily', 'wubis']",False
+prefix,passwd,12,"['passwd_3', 'passwd_timeout', 'passwdfiel', 'passwdfile', 'passwds']",False
+prefix,ext4,12,"['Ext4fs', 'ext43', 'ext45', 'ext4dev', 'ext4fs']",False
+prefix,wacom,12,"['WACOMalt', 'wacomOpenTablet', 'wacomalt', 'wacomcpl', 'wacoms']",False
+prefix,fstab,12,"['fstabab', 'fstabb', 'fstabe', 'fstabing', 'fstabs']",False
+prefix,dependency,12,['dependencys'],False
+prefix,traceroute,12,"['traceroute6', 'traceroutes']",False
+prefix,hardy,12,"['HardyHeroin', 'hardyRC1', 'hardyone', 'hardys', 'hardysources']",False
+prefix,running,12,"['running8', 'running_rabbit', 'running_rabbit07', 'runningbreezy', 'runnings']",False
+prefix,mozilla,12,"['MozillaGueirill', 'mozillanerd', 'mozillaplugins', 'mozillaproblem', 'mozillateam']",False
+prefix,vfat,12,"['vfat32', 'vfatrw', 'vfats']",False
+prefix,displays,11,"['DisplaySize', 'DisplaysPerHost', 'displaysize']",False
+prefix,reopen,11,"['reopened', 'reopening']",False
+prefix,virtualbox,10,"['VirtualBox2', 'VirtualBoxGuestAdditions', 'VirtualBoxOSE', 'virtualboxed', 'virtualboxes']",False
+prefix,trackpad,10,['trackpads'],False
+prefix,cmake,10,"['CMAKE_CXX', 'CMAKE_CXX_COMPILER', 'CMakeLists', 'cmakelist', 'cmakelists']",False
+prefix,indicator,9,"['Indicators', 'indicatorapplet', 'indicators']",False
+prefix,putty,9,"['Puttys', 'puttyFtp', 'puttySSH', 'puttygen', 'puttyscp']",False
+prefix,irssi,9,"['IrssiUrlLog', 'irssie', 'irssifan', 'irssii', 'irssis']",False
+prefix,dpkg,8,"['DpkgTerminalLog', 'dpkgI', 'dpkgbased', 'dpkglock', 'dpkgreconfigure']",False
+prefix,hosting,8,"['HostingGeek', 'hostings', 'hostingspace']",False
+prefix,warty,8,"['Warty64', 'WartyWarthog', 'warty0', 'wartyWardog', 'wartyyyy']",False
+prefix,nautilus,8,"['NAUTILUS_SCRIPT_SELECTED_URIS', 'NautilusIconContainer', 'Nautilusu', 'nautilus2', 'nautiluss']",False
+prefix,overlay,8,"['overlayed', 'overlayfs', 'overlays']",False
+prefix,pcmcia,8,"['pcmcia_core', 'pcmcia_cs', 'pcmcia_socket0', 'pcmciautils']",False
+prefix,kubuntu,8,"['kubuntu0desktop', 'kubuntublog', 'kubuntuisms', 'kubuntus', 'kubuntut']",False
+prefix,gedit,8,"['GEDIT_CURRENT_DOCUMENT_NAME', 'gedit2', 'gedit3', 'gedit_2', 'geditrc']",False
+prefix,ethernet,8,"['Ethernetport', 'ethernet_interface', 'ethernetcard', 'ethernetport', 'ethernets']",False
+prefix,runs,8,"['RunSky', 'runscape', 'runscript', 'runstartx', 'runsvdir']",False
+prefix,oracle,7,"['ORACLE_HOME', 'OracleGD', 'Oraclebeast', 'oracledb', 'oraclexe']",False
+prefix,chromium,7,"['ChromiumOS', 'chromium2', 'chromiumBSD', 'chromiumOS', 'chromiumos']",False
+prefix,lexmark,7,"['Lexmarks', 'lexmarks']",False
+prefix,realtek,7,"['Realtekfor', 'realtek8187B', 'realtek8196', 'realtek97', 'realteks']",False
+prefix,winamp,7,"['winamp2', 'winamp3', 'winamp5', 'winamps', 'winamptv']",False
+prefix,loopback,7,"['loopbacking', 'loopbackinterface', 'loopbackmount', 'loopbacks']",False
+prefix,ownership,7,['ownerships'],False
+prefix,ppas,6,"['pPASSWORD', 'ppasearch', 'ppasorry', 'ppassword', 'ppaste']",False
+prefix,peers,6,"['PeerShare', 'peers4beers', 'peerson', 'peersonally', 'peerstats']",False
+prefix,jaunty,6,"['JauntyReleaseSchedule', 'jaunty64', 'jauntyjoe', 'jauntys', 'jauntyx']",False
+prefix,bsod,6,"['BSODs', 'BSoDirl', 'bsodirl', 'bsods']",False
+prefix,flashplugin,6,"['flashplugin0free', 'flashplugin64', 'flashplugin_free', 'flashplugin_nonfree', 'flashplugins']",False
+prefix,gparted,6,"['GPartedLiveCD', 'gparted_details', 'gpartedis', 'gpartediting', 'gparteds']",False
+prefix,networkmanager,6,"['NetworkManagerApplet', 'NetworkManagerD', 'NetworkManagerUserSettings', 'NetworkManagers', 'networkmanagers']",False
+prefix,azureus,6,"['Azureus_2', 'Azureus_3', 'azureusname', 'azureuswiki']",False
+prefix,logs,6,"['logsa', 'logsave', 'logsentry', 'logsoff', 'logstalgia']",False
+prefix,networks,6,"['networkscripts', 'networksettings', 'networksolutions', 'networkspeed', 'networkswitch']",False
+prefix,netstat,5,"['Netstatlive', 'netstate', 'netstatus', 'netstatus_applet']",False
+prefix,homepage,5,"['homepages', 'homepagetools']",False
+prefix,killall,5,"['killallgdm', 'killalll', 'killalls', 'killallvthing']",False
+prefix,vivid,5,"['VividHazE', 'vividas', 'vividly', 'vividor_follador']",False
+prefix,sftp,5,"['sftpd', 'sftps']",False
+prefix,localhost,5,"['Localhost666', 'localhost2', 'localhost__', 'localhosts']",False
+prefix,bugs,5,"['bugslist', 'bugsme', 'bugsquad', 'bugsquashing']",False
+prefix,dmesg,5,"['dmesg_willys_fueguino', 'dmesged', 'dmesging', 'dmesgs']",False
+prefix,installing,5,"['installinging', 'installingit', 'installingnow', 'installings', 'installingwindows']",False
+prefix,aptitude,4,"['aptitudea', 'aptituded', 'aptitudes']",False
+prefix,karmic,4,"['karmic1', 'karmick', 'karmics']",False
+prefix,whereis,4,"['WhereIsMyCookie', 'WhereIsMySpoon', 'whereismyspoon']",False
+prefix,maverick,4,"['Maverick001', 'MaverickOne', 'maverick_', 'maverick_hunter']",False
+prefix,uptime,4,"['uptime2', 'uptimes']",False
+prefix,pages,4,"['Pagesize', 'pagesize', 'pagesl', 'pagestream']",False
+prefix,wireshark,4,"['wiresharking', 'wiresharkk', 'wiresharks', 'wiresharky']",False
+prefix,fluxbox,4,"['fluxboxing', 'fluxboxremake', 'fluxboxs', 'fluxboxspaceandspacegnome']",False
+prefix,banshee,4,"['Bansheed', 'Bansheee', 'bansheee', 'banshees']",False
+prefix,cards,4,"['cards_', 'cardserver', 'cardsharing', 'cardss']",False
+prefix,wikipedia,4,"['wikipedian', 'wikipedias']",False
+prefix,dismount,4,['dismounted'],False
+prefix,gtk2,4,"['GTK2_RC_FILES', 'gtk2html', 'gtk2html2', 'gtk2x']",False
+prefix,autoremove,4,"['autoremoved', 'autoremoves']",False
+prefix,strace,4,"['straced', 'stracelog']",False
+prefix,bootable,4,"['Bootable_NoEmulation', 'bootables']",False
+prefix,postfix,4,['postfixadmin'],False
+prefix,iptables,4,"['IpTablesd', 'IptablesHowto', 'iptables_', 'iptablessave']",False
+prefix,openssh,4,"['opensshd', 'opensshserver']",False
+prefix,grub2,3,"['grub21', 'grub25', 'grub2HAN_CHINESE_JAPANESE_KANJI']",False
+prefix,mkdir,3,"['mkdirasdfasdf', 'mkdirhier', 'mkdirs']",False
+prefix,authorized_keys,3,['authorized_keys2'],True
+prefix,lspci,3,"['lspcioutput', 'lspcis', 'lspciv']",False
+prefix,outlook,3,"['outlook2007', 'outlookers', 'outlooking']",False
+prefix,burning,3,"['burning_bronx', 'burningiso', 'burningisos']",False
+prefix,i386,3,"['i386_64', 'i386s']",False
+prefix,flashdrive,3,['flashdrives'],False
+prefix,booting,3,"['bootingprobs', 'bootings', 'bootingz']",False
+prefix,brasero,3,"['Brasero1', 'braserobraser', 'braseros']",False
+prefix,plugins,3,['plugins0'],True
+prefix,tcpdump,3,['tcpdumpgod'],False
+prefix,ipv6,3,"['ipv6_disable', 'ipv6disable', 'ipv6ism']",False
+prefix,soundcard,3,"['soundcardinfo', 'soundcardy']",False
+prefix,nopaste,2,"['nopasted', 'nopastesites']",False
+prefix,imgburn,2,['imgburner'],False
+prefix,backspace,2,"['backspaced', 'backspaces']",False
+prefix,safari,2,"['Safari_Al', 'Safaris']",False
+prefix,pulseaudio,2,"['PulseAudioWrangler', 'pulseaudiom']",False
+prefix,mounted,2,"['mountedpartition', 'mountedread']",False
+prefix,windowsme,2,"['windowsmediainstaller', 'windowsmediaplayer']",False
+prefix,crashed,2,"['crashedd', 'crashedm']",False
+prefix,devices,2,"['devicesa', 'deviceshow']",False
+prefix,latency,2,['latencytop'],False
+prefix,intrepid,2,"['Intrepid_Doesnt', 'intrepid1']",False
+prefix,logged,2,"['loggedin', 'loggedout']",False
+prefix,repositories,2,"['repositoriesL', 'repositoriesclick']",False
+prefix,qemu,2,['qemulator'],False
+prefix,options,2,"['optionsl', 'optionsman']",False
+prefix,ifconfig,2,"['ifconfigh', 'ifconfigup']",False
+prefix,nslookup,2,['nslookups'],False
+prefix,permissions,2,"['permissionss', 'permissionsy']",False
+prefix,https,1,['https_proxy'],False
+prefix,raring,1,['RaringOne'],False
+prefix,downloads,1,['downloadSSH'],False
+prefix,libreoffice,1,['libreoffice3'],True
+prefix,konsole,1,['konsoles'],False
+prefix,initramfs,1,['initramfstools'],False
+prefix,testdisk,1,['TestdiskL'],False
+prefix,upstart,1,['Upstartis'],False
+prefix,terraform,1,['terraforming'],False
+prefix,rhythmbox,1,['rhythmboxmp3'],False
+prefix,freezes,1,['freezess'],False
+prefix,postgresql,1,['postgresql8'],True
+prefix,useradd,1,['useradded'],False
+prefix,windowsnt,1,['windowsntf'],False
+prefix,flash64,1,['flash64bit'],False
+prefix,fat32,1,['fat32no'],False
+prefix,overheating,1,['overheatingy'],False
+prefix,crashing,1,['crashingthanks'],False
+prefix,compiled,1,['compiledI'],False
+prefix,mencoder,1,['mencoder_1'],False
+prefix,fixes,1,['fixeself'],False
+prefix,shotwell,1,['shotwelll'],False
+prefix,hostname,1,['hostnamehere'],False
+prefix,autoclean,1,['autocleaned'],False
+prefix,windowsxp,1,['WindowsXPUnderQemu'],False
+prefix,docstring,1,['docstrings'],False
+prefix,interfaces,1,['interfacesupplied'],False
+prefix,deluge,1,['deluged'],False
+prefix,howtos,1,['HowtoSetupNdiswrapper'],False
+prefix,docker,1,['dockers'],False
+prefix,timeline,1,['timelines'],False
+prefix,phpmyadmin,1,['phpmyadmins'],False
+suffix,ubuntu,5239,"['Xubuntu', 'bubuntu', 'edubuntu', 'lubuntu', 'xubuntu']",False
+suffix,chat,4442,"['Torchat', 'XChat', 'Xchat', 'weechat', 'xchat']",False
+suffix,config,3390,"['CompizConfig', 'autoconfig', 'compizconfig', 'iwconfig', 'xorgconfig']",False
+suffix,less,2935,"['fabless', 'outputless', 'regardless', 'unless', 'useless']",False
+suffix,ping,2755,"['dipping', 'hoping', 'sleeping', 'stopping', 'swapping']",False
+suffix,server,2575,"['gmediaserver', 'ubuntuserver', 'vncserver', 'xserver', 'yourserver']",False
+suffix,line,2249,"['commandline', 'eternalspline', 'modline', 'offline', 'online']",False
+suffix,torrent,1947,"['Bittorrent', 'bittorrent', 'ktorrent', 'qbittorrent', 'rtorrent']",False
+suffix,root,1903,"['DocumentRoot', 'MasterRoot', 'chroot', 'iceroot', 'noroot']",False
+suffix,file,1732,"['bash_profile', 'logfile', 'makefile', 'pidfile', 'swapfile']",False
+suffix,linux,1721,"['PlayOnLinux', 'philinux', 'playonlinux', 'selinux', 'zfsonlinux']",False
+suffix,mount,1616,"['Remount', 'amount', 'gmount', 'remount', 'umount']",False
+suffix,list,1615,"['blacklist', 'blocklist', 'iwlist', 'sourcelist', 'whitelist']",False
+suffix,sudo,1606,"['gksudo', 'gsudo', 'kdesudo', 'rootsudo', 'visudo']",False
+suffix,ports,1587,"['Backports', 'backports', 'bacports', 'imports', 'viewports']",False
+suffix,install,1504,"['Uninstall', 'checkinstall', 'cleaninstall', 'postinstall', 'uninstall']",False
+suffix,size,1268,"['HISTSIZE', 'blocksize', 'lvresize', 'ntfsresize', 'resize']",False
+suffix,user,1094,"['Adduser', 'adduser', 'fuser', 'randomenduser', 'superuser']",False
+suffix,more,1092,"['annymore', 'anymore', 'asizemore', 'blazemore', 'furthermore']",False
+suffix,port,892,"['apport', 'backport', 'import', 'serialport', 'suport']",False
+suffix,player,861,"['Linuxmediaplayer', 'audioplayer', 'blenderplayer', 'flashplayer', 'multiplayer']",False
+suffix,link,803,"['RaLink', 'VBALink', 'blink', 'botlink', 'dlublink']",False
+suffix,splash,793,"['bootsplash', 'nosplash', 'quiet_splash', 'usplash', 'xsplash']",False
+suffix,page,756,"['SecurityPage', 'manpage', 'rapage', 'startpage', 'transparent_hugepage']",False
+suffix,source,648,"['Resource', 'clocksource', 'opensource', 'powersource', 'resource']",False
+suffix,wifi,628,"['MadWifi', 'Madwifi', 'iwlwifi', 'madwifi', 'outbackwifi']",False
+suffix,ssid,612,"['BSSID', 'ESSID', 'bssid', 'essid', 'jessid']",False
+suffix,free,596,"['cgfree', 'dispyfree', 'nonefree', 'nonfree', 'textfree']",False
+suffix,desktop,573,"['fdesktop', 'gtkrecordmydesktop', 'rdesktop', 'recordMyDesktop', 'recordmydesktop']",False
+suffix,head,572,"['SREADAHEAD', 'ahead', 'clickhead', 'dualhead', 'readahead']",False
+suffix,boot,547,"['liveboot', 'multiboot', 'netbooT', 'netboot', 'wineboot']",False
+suffix,script,514,"['Javascript', 'downscript', 'ghostscript', 'javascript', 'postscript']",False
+suffix,fdisk,409,"['LordFDisk', 'aefdisk', 'cfdisk', 'sexyfdisk', 'sfdisk']",False
+suffix,unity,407,"['MyUnity', 'community', 'myunity', 'notunity', 'nounity']",False
+suffix,admin,379,"['GeekAdmin', 'gadmin', 'mdadmin', 'pjpmyadmin', 'sysadmin']",False
+suffix,edit,366,"['BCDEdit', 'JEdit', 'UltraEdit', 'geedit', 'pdfedit']",False
+suffix,package,365,"['metapackage', 'mteapackage', 'mypackage', 'psuedopackage', 'unpackage']",False
+suffix,site,360,"['e2dissite', 'oppisite', 'opposite', 'oversite', 'sebsite']",False
+suffix,files,343,"['gnomefiles', 'logfiles', 'mp3files', 'profiles', 'swapfiles']",False
+suffix,comment,338,"['UNCOMMENT', 'Uncomment', 'decomment', 'recomment', 'uncomment']",False
+suffix,mplayer,332,"['SMPlayer', 'gmplayer', 'kmplayer', 'smplayer', 'vmplayer']",False
+suffix,login,304,"['PermitRootLogin', 'autologin', 'hushlogin', 'relogin', 'tologin']",False
+suffix,card,291,"['Arucard', 'aircard', 'graphicscard', 'picard', 'sdcard']",False
+suffix,pages,288,"['codepages', 'manpages', 'mapages', 'webpages', 'wikipages']",False
+suffix,setup,272,"['cryptsetup', 'gdm2setup', 'gdmsetup', 'losetup', 'pptpsetup']",False
+suffix,modem,266,"['Winmodem', 'slmodem', 'softmodem', 'voicemodem', 'winmodem']",False
+suffix,device,256,"['ProcXCloseDevice', 'blockdevice', 'coredevice', 'libimobiledevice', 'thedevice']",False
+suffix,sound,240,"['asound', 'esound', 'extrasound', 'lib32asound', 'vsound']",False
+suffix,grep,235,"['egrep', 'ext3grep', 'ngrep', 'pgrep', 'suregrep']",False
+suffix,lags,229,"['LIBXML2_CFLAGS', 'SIOCSIFFLAGS', 'ServerFlags', 'bootflags', 'flags']",False
+suffix,mate,227,"['MacUltimate', 'altermate', 'ltimate', 'rymate', 'ultimate']",False
+suffix,help,221,"['Operhelp', 'devhelp', 'ehelp', 'linuxhelp', 'linuxminthelp']",False
+suffix,installed,218,"['checkinstalled', 'deinstalled', 'iinstalled', 'uninstalled', 'youinstalled']",False
+suffix,grub,217,"['RestoreGrub', 'SuperGrub', 'fixgrub', 'supergrub', 'wingrub']",False
+suffix,version,215,"['conversion', 'coversion', 'releaseversion', 'serverversion', 'subversion']",False
+suffix,passwd,215,"['gpasswd', 'htpasswd', 'opiepasswd', 'rootpasswd', 'smbpasswd']",False
+suffix,make,215,"['Automake', 'QMAKE', 'automake', 'pmake', 'qmake']",False
+suffix,panel,199,"['cpanel', 'fixpanel', 'lxpanel', 'resetpanel', 'secpanel']",False
+suffix,error,198,"['UnholyTerror', 'UrbanTerror', 'terror', 'uranterror', 'urbanterror']",False
+suffix,copy,197,"['K9Copy', 'K9copy', 'hardcopy', 'k9copy', 'rawcopy']",False
+suffix,acer,197,"['Macer', 'hacer', 'racer', 'supertuxracer', 'tuxracer']",False
+suffix,runs,188,"['foruns', 'overruns', 'rhoruns', 'speedruns', 'underruns']",False
+suffix,ported,186,"['backported', 'imported', 'reimported', 'sopported', 'suported']",False
+suffix,format,177,"['TVOutFormat', 'fileformat', 'freeformat', 'misformat', 'reformat']",False
+suffix,burn,177,"['Xfburn', 'cpuburn', 'mp3burn', 'xfburn', 'youburn']",False
+suffix,print,170,"['Gutenprint', 'Sprint', 'fingerprint', 'footprint', 'sprint']",False
+suffix,default,167,"['Ddefault', 'GRUB_CMDLINE_LINUX_DEFAULT', 'edefault', 'perdefault', 'xdefault']",False
+suffix,system,160,"['Microsystem', 'fileysystem', 'filysystem', 'ssystem', 'subsystem']",False
+suffix,tail,155,"['colortail', 'detail', 'essentail', 'flametail', 'multitail']",False
+suffix,download,153,"['Mbpsdownload', 'autodownload', 'btdownload', 'redownload', 'wxdownload']",False
+suffix,machine,152,"['SteamMachine', 'imachine', 'localmachine', 'nomachine', 'screwyourmachine']",False
+suffix,data,148,"['metadata', 'puredata', 'tzdata', 'userdata', 'www_data']",False
+suffix,screensaver,146,"['XScreensaver', 'Xscreensaver', 'gscreensaver', 'kscreensaver', 'xscreensaver']",False
+suffix,installing,144,"['_un_installing', 'deinstalling', 'theninstalling', 'uninstalling', 'uuninstalling']",False
+suffix,locate,134,"['allocate', 'dlocate', 'mlocate', 'slocate', 'unallocate']",False
+suffix,support,128,"['hardwaresupport', 'libflashsupport', 'mintsupport', 'picturesupport', 'techsupport']",False
+suffix,reinstalled,128,"['PREINSTALLED', 'preinstalled']",False
+suffix,resolution,128,"['855resolution', '915resolution', 'fixresolution', 'i915resolution', 'screenresolution']",False
+suffix,folder,127,"['fontsfolder', 'homefolder', 'myfolder', 'parentfolder', 'targettfolder']",False
+suffix,browser,125,"['abrowser', 'filebrowser', 'gmusibrowser', 'gmusicbrowser', 'webbrowser']",False
+suffix,shell,124,"['IRCshell', 'ashell', 'gnomeshell', 'powershell', 'rootshell']",False
+suffix,logs,120,"['blogs', 'changelogs', 'dialogs', 'mylogs', 'syslogs']",False
+suffix,intel,118,"['hdaintel', 'iIntel', 'snd_hda_intel', 'tointel', 'wintel']",False
+suffix,compiled,117,"['Recompiled', 'precompiled', 'recompiled', 'selfcompiled', 'uncompiled']",False
+suffix,bios,116,"['NETBIOS', 'inbios', 'netbios', 'openbios', 'smbios']",False
+suffix,wiki,112,"['gtdtiddlywiki', 'mediawiki', 'thinkwiki', 'thinwiki', 'ubuntuwiki']",False
+suffix,driver,105,"['maskeddriver', 'newdriver', 'nutdriver', 'olddriver', 'printerdriver']",False
+suffix,partition,103,"['gpartition', 'newpartition', 'repartition', 'unpartition', 'windowspartition']",False
+suffix,address,102,"['EMISADDRESS', 'ListenAddress', 'MasqueradeAddress', 'ipaddress', 'macaddress']",False
+suffix,options,98,"['InitializeGUCOptions', 'bootoptions', 'defoptions', 'lpoptions', 'someoptions']",False
+suffix,plugin,97,"['DmixPlugin', 'gcjwebplugin', 'lyricsplugin', 'mozplugin', 'nsplugin']",False
+suffix,game,94,"['PYgame', 'PyGame', 'ingame', 'pennergame', 'wolfgame']",False
+suffix,paste,94,"['copypaste', 'gpaste', 'mispaste', 'repaste', 'wgetpaste']",False
+suffix,gnome,93,"['eyeofgnome', 'libgnome', 'puregnome', 'sergnome', 'xchatgnome']",False
+suffix,fixes,88,"['XFIXES', 'bugfixes', 'prefixes', 'suffixes', 'xfixes']",False
+suffix,proxy,87,"['haproxy', 'https_proxy', 'simpleproxy', 'sshproxy', 'tinyproxy']",False
+suffix,wget,84,"['GWget', 'Gwget', 'gwget', 'pwget']",False
+suffix,icon,84,"['Decepticon', 'Silicon', 'decepticon', 'fastsilicon', 'fusionicon']",False
+suffix,ctrl,83,"['alsactrl', 'apachectrl', 'remoteCTRL', 'smartctrl', 'wmctrl']",False
+suffix,enable,82,"['BOOTLOGD_ENABLE', 'foo_enable', 'reenable', 'smtpd_sasl_auth_enable', 'unlistenable']",False
+suffix,module,79,"['LoadModule', 'kernelmodule', 'libgmodule', 'permodule', 'ppmodule']",False
+suffix,command,79,"['PROMPT_COMMAND', 'acommand', 'hcommand', 'lpd_command', 'somecommand']",False
+suffix,speed,77,"['cpuspeed', 'highspeed', 'netspeed', 'typespeed', 'upspeed']",False
+suffix,state,76,"['estate', 'nextstate', 'restate', 'saved_state', 'solidstate']",False
+suffix,channel,75,"['cochannel', 'nameofchannel', 'nameofthechannel', 'newchannel', 'ownchannel']",False
+suffix,sftp,74,"['VSftp', 'nsftp', 'psftp', 'vsftp', 'wsftp']",False
+suffix,gtk2,71,"['lgtk2', 'libgtk2', 'libwxgtk2', 'wxGTK2', 'wxgtk2']",False
+suffix,upgrade,66,"['cdromupgrade', 'distupgrade', 'eolupgrade', 'notinstalledyetbecauseofissuewithupgrade', 'reupgrade']",False
+suffix,mounted,66,"['dimounted', 'frontmounted', 'remounted', 'smbmounted', 'umounted']",False
+suffix,directory,66,"['adirectory', 'fakedirectory', 'homedirectory', 'realdirectory', 'subdirectory']",False
+suffix,windows,63,"['ActLikeWindows', 'fwindows', 'installwindows', 'n0windows', 'notwindows']",False
+suffix,password,62,"['1Password', 'apassword', 'lostpassword', 'rootpassword', 'userpassword']",False
+suffix,networkmanager,61,"['KNetworkManager', 'KnetworkManager', 'Knetworkmanager', 'cnetworkmanager', 'knetworkmanager']",False
+suffix,none,61,"['ANONE', 'anone', 'gnone', 'pumpingstationone', 'somenone']",False
+suffix,howto,61,"['BinaryDriverHowto', 'KeyspanDriverHowto', 'bashhowto', 'linuxhowto', 'xglhowto']",False
+suffix,dell,61,"['Riddell', 'josdell', 'kvidell', 'modell', 'rivendell']",False
+suffix,daemon,60,"['authdaemon', 'btgdaemon', 'evildaemon', 'gnome_settings_daemon', 'syncdaemon']",False
+suffix,qemu,60,"['KQEMU', 'KQemu', 'Kqemu', 'WindowsXPUnderQemu', 'kqemu']",False
+suffix,cache,58,"['aptcache', 'ccache', 'dnscache', 'filecache', 'libmemcache']",False
+suffix,monitor,58,"['dualmonitor', 'smartmonitor', 'sysmonitor', 'themonitor', 'udevmonitor']",False
+suffix,update,57,"['Ntpupdate', 'autoupdate', 'grub_update', 'nsupdate', 'utpupdate']",False
+suffix,cloud,55,"['OwnCloud', 'Owncloud', 'ScreenCloud', 'jolicloud', 'jollicloud']",False
+suffix,window,55,"['_NET_ACTIVE_WINDOW', 'closewindow', 'nameOFwindow', 'own_window', 'xwindow']",False
+suffix,username,54,"['myusername', 'otherusername', 'yourUserName', 'your_username', 'yourusername']",False
+suffix,java,54,"['astraljava', 'kjkjava', 'multijava', 'sunjava', 'wahjava']",False
+suffix,kernel,54,"['edgykernel', 'genkernel', 'microkernel', 'onkernel', 'withkernel']",False
+suffix,local,54,"['_rtld_local', 'aclocal', 'eyeslocal', 'install_local', 'setlocal']",False
+suffix,terminal,52,"['GRUB_TERMINAL', 'JustTerminal', 'dterminal', 'hyperterminal', 'interminal']",False
+suffix,echo,52,"['Chimecho', 'NetEcho', 'eternalecho', 'jecho', 'netecho']",False
+suffix,rsync,51,"['Grsync', 'S20rsync', 'grsync', 'gtkrsync', 'winrsync']",False
+suffix,wine,51,"['ImGonnaWine', 'darwine', 'swine', 'ubuntuwine', 'xwine']",False
+suffix,kubuntu,48,"['3kubuntu', 'TweakUbuntu', 'askubuntu', 'blackubuntu', 'ukubuntu']",False
+suffix,installer,47,"['adept_installer', 'flashinstaller', 'googleearthinstaller', 'kludgeinstaller', 'runinstaller']",False
+suffix,clone,47,"['botclone', 'mouseclone', 'msnclone', 'ntfsclone', 'patclone']",False
+suffix,display,47,"['SDISPLAY', 'lvdisplay', 'pvdisplay', 'sdisplay', 'vgdisplay']",False
+suffix,jockey,44,"['DistroJockey', 'Distrojockey', 'distrojockey']",False
+suffix,beta,43,"['04beta', '0beta', '11beta', 'FF3beta', 'lupusbeta']",False
+suffix,laptop,40,"['KsiLaptop', 'ServerTechLaptop', 'Yuiop_Laptop', 'rlaptop', 'xsinick_laptop']",False
+suffix,booting,40,"['multibooting', 'netbooting', 'reebooting', 'singlebooting', 'trippelbooting']",False
+suffix,disc,40,"['bak2disc', 'checkdisc', 'minidisc', 'scandisc', 'testdisc']",False
+suffix,string,40,"['X_GLXQueryServerString', 'dmi_save_oem_string', 'newstring', 'oldstring', 'searchstring']",False
+suffix,sata,40,"['Busata', 'eSATA', 'eSata', 'esata', 'nosata']",False
+suffix,bash,39,"['SudoBash', 'binbash', 'rbash', 'sudobash', 'wabash']",False
+suffix,filename,39,"['binfilename', 'myfilename', 'outputfilename', 'tarfilename', 'thenfilename']",False
+suffix,broken,38,"['Jailbroken', 'earsbroken', 'fixbroken', 'jailbroken', 'maybethewindowsshellisbroken']",False
+suffix,gedit,36,"['KRegEdit', 'PCRegedit', 'Regedit', 'ofregedit', 'regedit']",False
+suffix,apache,36,"['Rapache', 'dapache', 'eapache', 'libapache', 'stopapache']",False
+suffix,cards,35,"['aircards', 'flashcards', 'punchcards', 'reallyoldnetworkcards', 'vidcards']",False
+suffix,process,33,"['DefunctProcess', 'myprocess', 'pid_of_process', 'runasbackgroundprocess', 'someprocess']",False
+suffix,systems,33,"['Microsystems', 'OSystems', 'linuxsystems', 'subsystems', 'unixlikesystems']",False
+suffix,vesa,33,"['XVESA', 'Xvesa', 'cervesa', 'xforcevesa', 'xvesa']",False
+suffix,computer,32,"['dogatemycomputer', 'ecomputer', 'imonthecomputer', 'ubuntucomputer', 'ucomputer']",False
+suffix,interface,31,"['ethernet_interface', 'ipx_interface', 'loopbackinterface', 'netwerkinterface', 'webinterface']",False
+suffix,scroll,31,"['NetScroll', 'Xscroll', 'autoScroll', 'backscroll', 'rescroll']",False
+suffix,program,30,"['YourProgram', 'everyprogram', 'mailprogram', 'myprogram', 'qprogram']",False
+suffix,breezy,30,"['EASYBREEZY', 'Steff_breezy', 'easybreezy', 'runningbreezy', 'upgrade2breezy']",False
+suffix,convert,28,"['OGGconvert', 'audioconvert', 'ipodconvert', 'oggconvert', 'soundconvert']",False
+suffix,volume,28,"['LowerVolume', 'XF86AudioRaiseVolume', 'cvolume', 'multivolume', 'pvolume']",False
+suffix,debian,27,"['2debian', '5debian', 'Auron_Debian', 'bddebian', 'orDebian']",False
+suffix,software,26,"['DVSoftware', 'OpenSourceSoftware', 'anysoftware', 'freesoftware', 'idsoftware']",False
+suffix,devices,26,"['AutoAddDevices', 'blockdevices', 'dosdevices', 'iDevices', 'subdevices']",False
+suffix,squid,25,"['GeekSquid', 'geeksquid', 'rsquid', 'safesquid', 'supersquid']",False
+suffix,processor,25,"['microprocessor', 'multiprocessor', 'preprocessor', 'wordprocessor', 'worprocessor']",False
+suffix,logged,25,"['clogged', 'dialogged', 'flogged', 'relogged', 'tlogged']",False
+suffix,ntfs,24,"['captive_ntfs', 'captiventfs', 'ext2ntfs', 'mkntfs', 'writentfs']",False
+suffix,docker,24,"['KXdocker', 'Kxdocker', 'gxdocker', 'kdocker', 'kxdocker']",False
+suffix,wireless,24,"['anywireless', 'intellinuxwireless', 'laptopwireless', 'seattlewireless', 'ubuntuwireless']",False
+suffix,keyboard,24,"['akeyboard', 'daskeyboard', 'gtkeyboard', 'laptopkeyboard', 'mykeyboard']",False
+suffix,find,24,"['findfind', 'infind', 'kfind', 'refind', 'rpmfind']",False
+suffix,object,24,"['QObject', 'filesystemobject', 'gobject', 'swfobject', 'vobject']",False
+suffix,distro,23,"['configureoriwillinstallanrpmbaseddistro', 'iscurrentdistro', 'linuxdistro', 'minidistro', 'whatdistro']",False
+suffix,quake,23,"['YaQuake', 'earthquake', 'ioQuake', 'ioquake', 'yaquake']",False
+suffix,initramfs,23,['mkinitramfs'],False
+suffix,pcmcia,22,"['lspcmcia', 'nopcmcia', 'pata_pcmcia', 'start_pcmcia']",False
+suffix,evolution,21,"['Revolution', 'SyncEvolution', 'revolution', 'syncevolution']",False
+suffix,burning,21,"['cdburning', 'dvdburning', 'overburning', 'reburning', 'witchburning']",False
+suffix,connection,20,"['deconnection', 'dosconnection', 'internetconnection', 'nameofconnection', 'netconnection']",False
+suffix,vista,20,"['MaxiVista', 'altavista', 'bluevista', 'travista', 'winvista']",False
+suffix,latency,20,"['lowlatency', 'network_latency']",False
+suffix,router,20,"['brouter', 'erouter', 'evrouter', 'neorouter', 'prouter']",False
+suffix,xterm,20,"['lxterm', 'roxterm', 'uxterm']",False
+suffix,hosting,19,"['GHosting', 'a2hosting', 'ghosting', 'vhosting', 'webhosting']",False
+suffix,livecd,19,"['3livecd', 'MobaLiveCD', 'XLiveCD', 'customlivecd', 'drweblivecd']",False
+suffix,stability,19,"['instability', 'unstability']",False
+suffix,dash,19,"['dadash', 'helpingdash', 'logicaldash', 'maddash', 'thedash']",False
+suffix,reboot,18,"['coreboot', 'preboot', 'secureboot', 'sucureboot', 'thenreboot']",False
+suffix,output,18,"['chebiOutput', 'fulloutput', 'lspcioutput', 'script_output', 'soundoutput']",False
+suffix,installation,18,"['Ubuntuinstallation', 'Uninstallation', 'autoinstallation', 'deinstallation', 'uninstallation']",False
+suffix,account,18,"['IRCaccount', 'gmailaccount', 'mailaccount', 'rootaccount', 'useraccount']",False
+suffix,fstab,18,"['cfstab', 'ifstab', 'winmac_fstab', 'xffstab']",False
+suffix,hostname,18,"['dhostname', 'gethostname', 'hhostname', 'myhostname', 'yourhostname']",False
+suffix,hoary,18,"['AptAuthenticationInstructionsForHoary', 'hhoary', 'posthoary', 'upgrade2hoary', 'upgradehoary']",False
+suffix,service,17,"['DService', 'accountsservice', 'qualityofservice', 'sservice', 'webservice']",False
+suffix,bootable,17,['unbootable'],False
+suffix,curl,17,"['DivGradCurl', 'libcurl']",False
+suffix,mysql,17,"['S19mysql', 'S20mysql', 'S91mysql', 'cocoamysql', 'phpmysql']",False
+suffix,launcher,17,"['golauncher', 'klauncher', 'mswinurl_launcher', 'nameofguildwarslauncher', 'urllauncher']",False
+suffix,lamp,16,"['Glamp', 'Lunar_Lamp', 'clamp', 'lunar_lamp', 'vanillalamp']",False
+suffix,i386,16,"['0_i386', '10i386', '7_i386', 'FoxitReader10_Linux_enu_i386', 'sis_drv_i386']",False
+suffix,alsa,16,"['BorkedAlsa', 'balsa', 'maalsa', 'thealsa', 'winealsa']",False
+suffix,pulse,16,"['EMPulse', 'impulse', 'removepulse', 'squarepulse', 'vimpulse']",False
+suffix,purge,16,"['fpurge', 'how2purge', 'localepurge', 'localpurge', 'ppapurge']",False
+suffix,compiler,16,"['CMAKE_CXX_COMPILER', 'crosscompiler', 'decompiler']",False
+suffix,crash,16,"['Robbie_Crash', 'fixadeptcrash', 'nocrash', 'planecrash', 'snowcrash']",False
+suffix,64bit,15,"['AMD64bit', 'Turion64bit', 'Ubuntu64Bit', 'vista64bit', 'wine64bit']",False
+suffix,gmail,15,"['Enigmail', 'cgmail', 'enigmail', 'kcheckgmail', 'soGmail']",False
+suffix,intrepid,15,['danbh_intrepid'],False
+suffix,quit,14,"['GRUB_HIDDEN_TIMEOUT_QUIT', 'SIGQUIT', 'forcequit', 'ragequit', 'uim_quit']",False
+suffix,running,14,"['andrunning', 'arunning', 'imrunning', 'rerunning', 'yourunning']",False
+suffix,emacs,14,"['QEmacs', 'XEmacs', 'coughemacs', 'sxemacs', 'xemacs']",False
+suffix,nvidia,13,"['1nvidia', 'envidia', 'invidia', 'libnvidia', 'thenameofnvidia']",False
+suffix,which,13,"['edwardthefmawhich', 'everywhich', 'iwhich', 'kpsewhich', 'wwhich']",False
+suffix,synaptic,12,"['fromsynaptic', 'gsynaptic', 'insynaptic', 'ksynaptic', 'psynaptic']",False
+suffix,apple,12,"['Crapple', 'corrytonapple', 'crapple', 'exapple', 'pinapple']",False
+suffix,fluxbox,12,"['purefluxbox', 'startfluxbox']",False
+suffix,permissions,11,"['ExecOptionPermissions', 'ExecPermissions', 'filepermissions', 'understandingpermissions', 'writepermissions']",False
+suffix,firewall,11,"['KMyFirewall', 'PMfirewall', 'afirewall', 'kfirewall', 'kmyfirewall']",False
+suffix,traceroute,11,"['gtraceroute', 'tcptraceroute', 'xtraceroute']",False
+suffix,overlay,11,"['OpenGLOverlay', 'VideoOverlay', 'videooverlay']",False
+suffix,packet,11,"['PF_PACKET', 'af_packet', 'receive_packet', 'recieve_packet', 'synapticpacket']",False
+suffix,hardy,11,"['diehardy', 'ihearthardy', 'nhardy', 'serverhardy', 'withHardy']",False
+suffix,application,10,"['ExampleApplication', 'aapplication', 'myapplication', 'whatapplication', 'yourapplication']",False
+suffix,reinstall,10,"['Preinstall', 'dreinstall', 'how2reinstall', 'preinstall', 'toreinstall']",False
+suffix,gimp,10,"['PhotoGimp', 'filmgimp', 'libgimp', 'supergimp', 'theGimp']",False
+suffix,repository,10,"['LocalRepository', 'extrarepository', 'offlinerepository', 'therepository']",False
+suffix,pastebin,10,"['Ipastebin', 'apastebin', 'initpastebin', 'repastebin', 'yourpastebin']",False
+suffix,xfce,9,"['leonardoXfce', 'libxfce', 'purexfce', 'startxfce']",False
+suffix,wacom,9,"['libwacom', 'linuxwacom', 'xsetwacom']",False
+suffix,syntax,9,"['Perlsyntax', 'invalidsyntax', 'perlsyntax']",False
+suffix,graphics,9,"['i95Graphics', 'kdegraphics', 'libgraphics', 'lowgraphics', 'vectorgraphics']",False
+suffix,irssi,9,"['Dynamit_irssi', 'iirssi', 'ormirssi', 'quietirssi']",False
+suffix,repo,9,"['chrepo', 'easyrepo', 'erepo', 'localrepo', 'mrepo']",False
+suffix,xmms,9,"['cornerxmms', 'gxmms', 'pyXMMS', 'wmXMMS']",False
+suffix,bugs,9,"['Heisenbugs', 'debbugs', 'debugs', 'driverbugs', 'winbugs']",False
+suffix,repos,8,"['list_extrarepos', 'lucidrepos', 'rrepos', 'standardrepos', 'therepos']",False
+suffix,dhcp,8,"['NODHCP', 'StaticDnsWithDhcp', 'gdhcp', 'mnegDHCP', 'udhcp']",False
+suffix,wlan,8,"['iwlan', 'kwlan', 'mitzawlan']",False
+suffix,xwindows,8,"['WXWINDOWS', 'wxwindows']",False
+suffix,lxde,7,"['purelxde', 'startlxde']",False
+suffix,interfaces,7,"['cinterfaces', 'networkinterfaces', 'subinterfaces', 'userinterfaces', 'webinterfaces']",False
+suffix,idle,7,"['didle', 'fidle', 'midle']",False
+suffix,totem,7,"['Runetotem', 'YouTotem', 'dtotem', 'replacetotem', 'tototem']",False
+suffix,array,7,"['SmartArray', '_array', 'in_array', 'numarray', 'scorearray']",False
+suffix,sqlite,7,"['PySQLite', 'libsqlite', 'pdo_sqlite']",False
+suffix,http,7,"['emhttp', 'kiohttp', 'minihttp', 'simplehttp', 'simpllehttp']",False
+suffix,networks,7,"['Wirelessnetworks', 'blackcatnetworks', 'juniper_networks', 'mynetworks', 'permit_mynetworks']",False
+suffix,graphic,7,"['Geographic', 'cryptographic', 'geographic', 'ortographic', 'safegraphic']",False
+suffix,plugins,7,"['gplugins', 'kipiplugins', 'mozillaplugins', 'searchplugins', 'w32plugins']",False
+suffix,library,7,"['alibrary', 'elibrary', 'medialibrary', 'qtlibrary', 'zlib_library']",False
+suffix,backspace,7,"['CTRLALTBackspace', 'CtrlAltBackspace', 'crtl_alt_backspace', 'ctrlaltbackspace', 'ctrlasltbackspace']",False
+suffix,mozilla,7,"['firefoxismozilla', 'libtotem_mozilla', 'mplayer_mozilla', 'rinaldi__Mozilla', 'runmozilla']",False
+suffix,dpkg,7,"['buildpkg', 'donedpkg', 'libdpkg', 'trdpkg']",False
+suffix,protocol,7,"['multiprotocol', 'storageprotocol']",False
+suffix,htop,7,"['ashtop', 'faithtop', 'spalshtop', 'splshtop']",False
+suffix,ndiswrapper,6,"['Dndiswrapper', 'HowtoSetupNdiswrapper', 'forfarndiswrapper', 'undiswrapper', 'unndiswrapper']",False
+suffix,repositories,6,"['AddingMultimediaRepositories', 'extrarepositories', 'meanrepositories', 'yourrepositories']",False
+suffix,filesystem,6,"['badbadfilesystem', 'localfilesystem', 'networkfilesystem', 'pickafilesystem', 'rootfilesystem']",False
+suffix,dapper,6,"['Sktfeelsdapper', 'com_ubuntu_dists_dapper', 'getdapper', 'sktdapper', 'upgrade2dapper']",False
+suffix,bootloader,6,"['abootloader', 'chainbootloader', 'nbootloader', 'ntbootloader', 'uberbootloader']",False
+suffix,firefox,6,"['getfirefox', 'myfirefox', 'pdffirefox', 'sfirefox', 'usefirefox']",False
+suffix,peers,6,"['allpeers', 'beers4peers', 'disapeers', 'dissapeers', 'tls_peers']",False
+suffix,nautilus,6,"['gtnautilus', 'libnautilus', 'snautilus']",False
+suffix,envy,6,"['SEnvy', 'aenvy', 'emergenvy', 'jenvy']",False
+suffix,lucid,5,"['Gump_lucid', 'blucid', 'ubulucid']",False
+suffix,export,5,"['mythexport', 'nexport', 'r8180_export', 'unexport']",False
+suffix,tutorial,5,"['atutorial', 'sigtutorial', 'ttutorial']",False
+suffix,indicator,5,"['appindicator', 'cairo_dock_load_task_indicator', 'libappindicator', 'vindicator']",False
+suffix,downloads,5,"['3ddownloads', 'MyDownloads', 'Mydownloads', 'autodownloads', 'redownloads']",False
+suffix,edgy,5,"['eedgy', 'ubuntuEdgy', 'wedgy']",False
+suffix,raring,5,['unraring'],False
+suffix,realtek,5,"['_iGadget_RealTek', 'snd_hda_codec_realtek']",False
+suffix,localhost,5,"['1localhost', 'X11UseLocalhost', 'steveatlocalhost', 'stevestlocalhost']",False
+suffix,gateway,4,"['defaultgateway', 'sipgateway', 'webgateway', 'yourgateway']",False
+suffix,pidgin,4,"['AmarokPidgin', 'FunPidgin', 'InstallPidgin', 'hmw_pidgin']",False
+suffix,openoffice,4,"['nopenoffice', 'oopenoffice', 'removeopenoffice']",False
+suffix,vfat,4,"['makefs_vfat', 'mkvfat', 'tvfat']",False
+suffix,cheese,4,"['magiccheese', 'quantumcheese', 'stolencheese']",False
+suffix,vector,4,"['NullVector', 'OpenVector', 'QVector', 'qtvector']",False
+suffix,commit,4,"['jfsCommit', 'overcommit']",False
+suffix,freezes,4,"['minifreezes', 'ufreezes', 'unfreezes']",False
+suffix,ipv6,4,"['CONFIG_IPV6', 'disableIpv6', 'iipv6', 'listen_ipv6']",False
+suffix,mencoder,4,"['gmencoder', 'kmencoder']",False
+suffix,services,4,"['Ircservices', 'localservices', 'replication_services', 'whatservices']",False
+suffix,ext3,4,"['Linux_Ext3', 'fs2ext3', 'linuxext3', 'xext3']",False
+suffix,website,4,"['chatwebsite', 'googlewebsite', 'phpWebsite', 'phpwebsite']",False
+suffix,gutsy,3,"['doesntgutsy', 'gutsygutsy', 'kickgutsy']",False
+suffix,crashed,3,"['permacrashed', 'ubuntucrashed', 'xcrashed']",False
+suffix,updated,3,"['autoupdated', 'beenupdated', 'unupdated']",False
+suffix,useradd,3,"['1useradd', 'adduseradd', 'smbuseradd']",False
+suffix,symlink,3,"['nameofsymlink', 'unsymlink', 'yoursymlink']",False
+suffix,compiz,3,"['gcompiz', 'nosvg_compiz', 'runningcompiz']",False
+suffix,flashplugin,3,"['freeflashplugin', 'libflashplugin']",False
+suffix,precise,3,"['dapperandbeprecise', 'inprecise', 'unprecise']",False
+suffix,dualboot,3,"['grubdualboot', 'ubuntudualboot', 'yabootconfigurationformacintoshpowerpcsdualboot']",False
+suffix,reliability,3,['unreliability'],False
+suffix,chown,3,"['sudochown', 'tchown', 'unchown']",False
+suffix,gparted,3,"['lgparted', 'meGPARTED', 'orgparted']",False
+suffix,offtopic,3,"['EOFFTOPIC', 'omgofftopic', 'ubuntu_offtopic']",False
+suffix,fglrx,3,"['Xorg_driver_fglrx', 'atifglrx', 'libfglrx']",False
+suffix,grub2,3,"['SuperGrub2', 'fixgrub2']",False
+suffix,soundcard,3,"['csoundcard', 'nvidiaonboardsoundcard', 'yoursoundcard']",False
+suffix,opera,3,"['iOpera', 'iopera', 'lefantomedlopera']",False
+suffix,nano,3,"['Enano', 'ernano', 'therealnano']",False
+suffix,dmesg,3,"['ddddddddddddddddmesg', 'doeslinuxhavedmesg', 'indmesg']",False
+suffix,extracting,3,['selfextracting'],False
+suffix,global,3,"['TriStarGlobal', 'sbcglobal', 'transdgaming_global']",False
+suffix,jaunty,3,"['danbhfive_jaunty', 'hjaunty', 'ujaunty']",False
+suffix,ext2,3,"['SublimeText2', 'ifsext2', 'text2']",False
+suffix,mkdir,3,['binmkdir'],False
+suffix,loopback,2,"['inetloopback', 'vloopback']",False
+suffix,empathy,2,"['PurgeEmpathy', 'trayempathy']",False
+suffix,outlook,2,"['dimoutlook', 'weboutlook']",False
+suffix,snap,2,"['aerosnap', 'rsnap']",False
+suffix,result,2,"['buildresult', 'image_result']",False
+suffix,feisty,2,"['04_Feisty', 'kfeisty']",False
+suffix,virtualbox,2,['phpvirtualbox'],False
+suffix,udev,2,"['libudev', 's10udev']",False
+suffix,unmount,2,"['alwaysunmount', 'autounmount']",False
+suffix,crashing,2,"['keepscrashing', 'xcrashing']",False
+suffix,azure,2,"['lazure', 'pleazure']",False
+suffix,thinkpad,2,['ibmthinkpad'],False
+suffix,dependencies,2,"['pdependencies', 'unmetdependencies']",False
+suffix,putty,2,"['cowputty', 'knowputty']",False
+suffix,cdrom,2,"['00trustcdrom', 'yourcdrom']",False
+suffix,vmware,2,"['freevmware', 'vvmware']",False
+suffix,amarok,2,"['gamarok', 'maamarok']",False
+suffix,wpa_supplicant,2,['IPW_IOCTL_WPA_SUPPLICANT'],False
+suffix,ppas,2,['appas'],False
+suffix,radeon,2,"['Atiradeon', 'openradeon']",False
+suffix,iptables,2,"['CONFIG_IP_NF_IPTABLES', 'jiptables']",False
+suffix,warty,2,"['twarty', 'wwarty']",False
+suffix,automount,2,"['media_automount', 'medis_automount']",False
+suffix,autoremove,2,['01autoremove'],False
+suffix,aptitude,2,"['01aptitude', '05aptitude']",False
+suffix,inkscape,1,['useinkscape'],False
+suffix,ownership,1,['CHangeOWNership'],False
+suffix,verified,1,['unverified'],False
+suffix,disconnected,1,['notdisconnected'],False
+suffix,rhythmbox,1,['mrhythmbox'],False
+suffix,netstat,1,['nnetstat'],False
+suffix,dependency,1,['predependency'],False
+suffix,postfix,1,['S20postfix'],False
+suffix,timeline,1,['futuretimeline'],False
+suffix,cannot,1,['acannot'],False
+suffix,operator,1,['pcoperator'],False
+suffix,wubi,1,['onwubi'],False
+suffix,maverick,1,['TheMaverick'],False
+suffix,fat32,1,['HDfat32'],False
+suffix,flash64,1,['iflash64'],False
+suffix,displays,1,['Xdisplays'],False
+suffix,automatix,1,['getautomatix'],False
+suffix,jenkins,1,['ubuntujenkins'],False
+suffix,tunneling,1,['sshtunneling'],False
+suffix,gdesklets,1,['isgdesklets'],False
+suffix,automate,1,['xautomate'],False
+suffix,cmake,1,['ccmake'],False
+suffix,azureus,1,['_pathtoazureus_azureus'],False
+suffix,pulseaudio,1,['S50pulseaudio'],False
+suffix,telnet,1,['Icantelnet'],False
+suffix,thunderbird,1,['onThunderBird'],False
+suffix,uptime,1,['bootuptime'],False
+suffix,deluge,1,['rundeluge'],False
+suffix,strace,1,['backstrace'],False
+suffix,wireshark,1,['Hwireshark'],False
+suffix,ifconfig,1,['uifconfig'],False
+suffix,trackpad,1,['lstrackpad'],False
+suffix,integrity,1,['mrintegrity'],False
+suffix,return,1,['rreturn'],False
+suffix,dismount,1,['autodismount'],False
+suffix,motherboard,1,['rmotherboard'],False
+suffix,chromium,1,['triedchromium'],False
+suffix,netinstall,1,['mlnetinstall'],False
+suffix,karmic,1,['puregnomekarmic'],False
+suffix,whoami,1,['ldapwhoami'],False
+suffix,ipv4,1,['preferipv4'],False
+suffix,push,1,['OPUSH'],False
+suffix,phpmyadmin,1,['myphpmyadmin'],False
+suffix,dvds,1,['copydvds'],False
+suffix,submit,1,['resubmit'],False
+suffix,busybox,1,['onbusybox'],False
+suffix,nslookup,1,['dnslookup'],False
+suffix,safari,1,['asafari'],False
+infix,format,1176,"['informatics', 'information', 'reformatting', 'unformatted', 'uninformative']",False
+infix,config,922,"['ISPconfig3', 'autoconfiguration', 'misconfiguration', 'reconfigure', 'reconfiguring']",False
+infix,port,825,"['Important', 'importance', 'important', 'proportional', 'transporter']",False
+infix,tail,589,"['SuperTails92', 'detailed', 'detailing', 'detailled', 'details']",False
+infix,line,539,"['guadalinexv8', 'klined', 'newlines', 'oneliner', 'scrollback_lines']",False
+infix,link,493,"['Elinks', 'blinking', 'deadlinks', 'elinks', 'hardlinks']",False
+infix,list,431,"['blacklisted', 'blacklisting', 'realistic', 'realisticly', 'whitelisted']",False
+infix,sftp,366,"['VSFTPD', 'bsftpd', 'vsFTPd', 'vsftpd', 'wsftpd']",False
+infix,source,365,"['Opensourceeee', 'Xresources', 'opensourcemusicians', 'resources', 'ressources']",False
+infix,script,341,"['description', 'gscripter', 'initscripts', 'inscription', 'shellscripts']",False
+infix,ubuntu,334,"['0ubuntu1', '0ubuntu11', 'Freshubuntunoob', 'HAN_CHINESE_JAPANESE_KANJIUBUNTU8', 'UBUNTUSUCKSUBUNTUSUCKSUBUNTUSUCKSUBUNTUSUCKSUBUNTUSUCKSUBUNTUSUCKSUBUNTUSUCKSUBUNTUSUCKSUBUNTUSUCKSUBUNTUSUCKSUBUNTUSUCKS']",False
+infix,boot,333,"['netbootin', 'ubuntubootissue', 'unbootin', 'unebootin', 'unebootto']",False
+infix,free,310,"['libfreetype6', 'touchfreeze', 'unfreeze', 'xfree86', 'xfs_freeze']",False
+infix,root,289,"['CHKRootKit', 'Chrooting', 'chrooted', 'chrooting', 'punjabiroots']",False
+infix,mate,252,"['Ultimately', 'acclamated', 'animated', 'approximately', 'ultimateedition']",False
+infix,user,251,"['brousers', 'compuserve', 'sabayonuser__', 'ubuntuusers', 'vboxusers']",False
+infix,head,248,"['boneheadedness', 'hostheader', 'siftheads', 'theadmi', 'theadmin']",False
+infix,mount,212,"['amounts', 'gmountiso', 'remounting', 'umounting', 'umountwrapper']",False
+infix,size,206,"['asizemore', 'oversized', 'resize_reiserfs', 'resized', 'resizes']",False
+infix,less,198,"['AlessonZaire', 'alessandro_', 'cluelessperson', 'flawlessly', 'hopelessly']",False
+infix,download,197,"['JDownloader', 'btdownloadcurses', 'jDownloader', 'jdownloader', 'predownloaded']",False
+infix,make,192,"['WindowMaker', 'automake1', 'phpmaker', 'windowmaker', 'wmaker']",False
+infix,locate,191,"['Unallocated', 'allocated', 'allocatedon', 'reallocates', 'unallocated']",False
+infix,comment,185,"['UNcommented', 'uncommentable', 'uncommented', 'uncommenting', 'uncomments']",False
+infix,linux,168,"['FoxitReader10_Linux_enu_i386', 'GRUB_CMDLINE_LINUX_DEFAULT', 'PCLINUXOS', 'PCLinuxOS', 'linuxlinuxlinux']",False
+infix,help,158,"['DownloadHelper', 'behelpful', 'downloadhelper', 'khelper', 'unhelping']",False
+infix,support,153,"['UNsupported', 'Unsupported', 'insupported', 'undersupported', 'unsupported']",False
+infix,sound,153,"['asoundconf', 'asoundrc', 'libasound32', 'nsoundjuicer', 'petsounds']",False
+infix,partition,142,"['prepartitioning', 'repartitionate', 'repartitioned', 'repartitioning', 'unpartitioned']",False
+infix,chat,141,"['HAN_CHINESE_JAPANESE_KANJIXCHATHAN_CHINESE_JAPANESE_KANJI', 'PaulChater', 'xchat2', 'xchats', 'yahoochats']",False
+infix,server,138,"['gameservers', 'megaservers', 'ntp_server1', 'ntp_server2', 'webservers']",False
+infix,edit,126,"['OpenMovieEditor', 'PDFeditor', 'hexeditor', 'texteditor', 'ultimateedition']",False
+infix,plugin,126,"['FP9_plugin_beta_112006', 'libjavaplugin_oji', 'ndispluginwrapper', 'nspluginwrapper', 'unpluging']",False
+infix,icon,125,"['atiiconfig', 'emoticons', 'favicons', 'siconnecting', 'uniconv']",False
+infix,apache,117,"['Aapache2', 'S91apache2', 'WindowsApacheMysqlPHP', 'k91apache2', 'libapache2']",False
+infix,intel,115,"['0_LinuxIntel_install_wJRE_en', 'defintely', 'greatintelligence_bootsale', 'mNotIntelligent', 'snd_intel8x0']",False
+infix,package,103,"['KPackageKit', 'downgradepackages', 'metapackages', 'newpackages', 'prepackaged']",False
+infix,player,102,"['cdplayers', 'etplayer_fiesty9', 'install_flash_player_7_linux', 'install_flash_player_9_linux', 'mediaplayers']",False
+infix,snap,99,"['ksnapshot', 'mastiffsnapoli', 'rsnapsho', 'rsnapshot', 'sysnaptic']",False
+infix,convert,98,"['OGGconverter', 'SoundConverter', 'autoconverted', 'soundconverter', 'videoconverter']",False
+infix,game,98,"['Dgameman1', 'bsdgames', 'consolegames', 'megamek', 'ubuntugames']",False
+infix,quit,94,"['XquitqQ', 'loquitus_of_borg', 'mezquitale', 'poquito', 'sequiturs']",False
+infix,apple,91,"['Grappleseed', 'dappler', 'jzapples', 'netapplet', 'netstatus_applet']",False
+infix,print,87,"['OpenPrinting', 'fingerprints', 'openprinting', 'some_cups_printer_queue', 'sprints']",False
+infix,http,86,"['Lighttpd', 'ghttpd', 'lighttpd', 'nsXMLHttpRequest', 'thttpd']",False
+infix,site,81,"['necessites', 'nopastesites', 'prequesites', 'requisites', 'visited']",False
+infix,file,81,"['Openfiler', 'nameoffileandpath', 'profiler', 'pspfiler', 'whateverthebinfileiscalled']",False
+infix,modem,79,"['WinModems', 'Winmodems', 'cablemodems', 'usbadslmodemmanager', 'winmodems']",False
+infix,burn,74,"['backburners', 'cdburner', 'cdburnerxp', 'gnomeburner', 'primoburner']",False
+infix,grep,74,"['AddingRepositoriesHowto', 'addingrepositories', 'bugreport', 'bugreporter', 'bugreports']",False
+infix,folder,74,"['YOURFOLDERHERE', 'dotfolders', 'ifolders', 'subfolder1', 'subfolders']",False
+infix,ping,69,"['Kamping_Kaise1', 'Kamping_Kaiser', 'hping3', 'mispinged', 'pumpingstationone']",False
+infix,opera,69,"['cooperating', 'cooperation', 'interoperate', 'interroperate', 'un_operateur']",False
+infix,disc,68,"['3Disch', 'DHCPDISCOVER', 'autodiscovery', 'harddiscs', 'ididnotbeginthisdiscussion']",False
+infix,driver,68,"['Comparison_of_open_source_wireless_drivers', 'atidrivername', 'atidrivers', 'audiodrivers', 'somedrivers']",False
+infix,default,67,"['AddDefaultCharset', 'Xdefaults', 'nodefaultroute', 'savedefaults', 'xdefaults']",False
+infix,acer,65,"['Spaceraver', 'eracerbit', 'exacerbating', 'mzracer360', 'tracert']",False
+infix,synaptic,65,"['GSynaptics', 'Gsynaptics', 'gsynaptics', 'ksynaptics', 'qsynaptics']",False
+infix,machine,62,"['EvilMachine_', 'eMachines', 'emachines', 'godmachine81', 'silvermachine4']",False
+infix,grub,61,"['SuperGrubDisk', 'Supergrubdisk', 'kgrubeditor', 'supergrubdisk', 'xGrub11']",False
+infix,command,57,"['FreeCommander', 'misslecommander', 'recommandation', 'recommandations', 'recommanded']",False
+infix,error,54,"['CorruptTerrorist', 'syntaxerror55', 'terroris', 'terrorist', 'xsession_errors']",False
+infix,install,52,"['0_LinuxIntel_install_wJRE_en', 'configureoriwillinstallanrpmbaseddistro', 'uninstallable', 'uninstallit', 'uninstalll']",False
+infix,repo,51,"['CorePointer', 'dslreports', 'missreporting', 'sharepoints', 'statreports']",False
+infix,gnome,49,"['libgnome2', 'libgnome32', 'libgnomeprint', 'libgnomeui', 'unGNOMEish']",False
+infix,wifi,47,"['Kwifimanager', 'MadWifif', 'kwifimanager', 'madwificard', 'madwifii']",False
+infix,page,47,"['autopager', 'rampage73', 'rampageoberon', 'skip_pager', 'spagetti']",False
+infix,state,42,"['Firestater', 'estatement', 'firestater', 'frustated', 'understatement']",False
+infix,update,41,"['hldsupdatetool', 'kernelupdates', 'killupdatemanager', 'nxupdates', 'proposedupdates']",False
+infix,admin,40,"['Sysadmins', 'gotosystemadministrationprining', 'sysadmins', 'webadminstrator', 'yahoo_admin_dave']",False
+infix,dell,34,"['adelle25566', 'dbordello', 'mcrandello', 'modeller', 'modelling']",False
+infix,more,34,"['El_zoologico_de_morelia_la_verdad', 'IWantMoreCowBell', 'Memorex', 'de_amore_imah', 'delmorep']",False
+infix,panel,33,"['cpanell', 'gnomepanels', 'resetpanels', 'rpanels', 'touchpanels']",False
+infix,program,29,"['GL_OES_get_program_binary', 'JavaProgrammer', 'arielprogrammer', 'cprogramming', 'webprogrammingquestions']",False
+infix,bash,28,"['DrBashir2', 'Mobasher', 'abashrc', 'mobasher', 'sambashare']",False
+infix,ssid,28,"['ESSIDs', 'PUTyourESSIDhere', 'bssids', 'essids', 'supossidly']",False
+infix,dvds,27,"['XDVDShrink', 'Xdvdshrink', 'libdvdss', 'xdvdshrink']",False
+infix,enable,27,"['CONFIG_MTRR_SANITIZER_ENABLE_DEFAULT', 'HIDD_ENABLED', 'howinthehelldoienablepae', 'reenabled', 'selinuxenabled']",False
+infix,scroll,27,"['LIBOVERLAY_SCROLLBAR', 'PID_OFSCROLLKEEPER', 'VerticalScrollDelta', 'horizonalscrolldelta', 'realscrolling']",False
+infix,card,26,"['Ricardo', 'Ryccardo', 'bcardarella', 'netcardconfig', 'picard1400']",False
+infix,module,26,"['DISABLED_MODULES', 'DUMP_MODULES', 'acpi_module_called', 'kernelmodules', 'lsb_modules']",False
+infix,beta,26,"['04beta1', '04beta2', '0beta4', '3beta5', 'FP9_plugin_beta_112006']",False
+infix,java,26,"['libjavaplugin', 'libjavaplugin_oji', 'libjavaplugin_ojigcc3', 'libjavaplugin_osi', 'sunjava5bin']",False
+infix,torrent,25,"['bittorrenting', 'bittorrents', 'ktorrents', 'libtorrent5', 'utorrentis']",False
+infix,version,25,"['180versions', 'conversions', 'modversions', 'reconversions', 'subversions']",False
+infix,sata,22,"['BurninSatan', 'darkersatanic', 'lsatarnes', 'luisatania', 'ubuntusatanic']",False
+infix,process,22,"['Multiprocessing', 'childprocesses', 'multiprocessing', 'postprocessing', 'wordprocessing']",False
+infix,setup,22,"['__glutSetupColormap', 'gdmsetups', 'k3bsetup2', 'winesetuptk']",False
+infix,mysql,21,"['ApacheMySQLPHP', 'WindowsApacheMysqlPHP', 'libmysqlclient', 'libmysqlclient14', 'phpmysqladmin']",False
+infix,cache,21,"['_CACHE_001_', '_CACHE_002_', '_CACHE_003_', '_CACHE_MAP_', 'memcached']",False
+infix,data,20,"['GL_NV_pixel_data_range', 'GetDataBack', 'hsperfdata_mgdam', 'megadatacenters', 'updatable']",False
+infix,find,20,"['RPMfinder', 'av_find_stream_info', 'diffindo', 'robotfindskitten', 'wheredoifindmyspacebarcontrols']",False
+infix,curl,20,"['libcurl3', 'libcurl4', 'libcurlz', 'particurlary', 'securly']",False
+infix,upgrade,20,"['BreezyUpgradeNotes', 'EdgyUpgrades', 'brezyupgradenotes', 'distupgrades', 'iupgraded']",False
+infix,alsa,19,"['Balsak', 'alsaalsaooooooossssssss', 'gnomealsamixer', 'malsasa', 'metalsand2']",False
+infix,library,19,"['LDLIBRARY_PATH', 'LD_LIBRARYPATH', 'LD_LIBRARY_PATH', 'ld_library_path', 'lyourfavoritelibraryhere']",False
+infix,device,19,"['_device_', 'idevicepair', 'idevicerestore', 'libavdevice32', 'usb_device_62a_0_noserial_if0']",False
+infix,xfce,17,"['libxfce4util2', 'libxfcegui', 'startxfce4', 'stratxfce4']",False
+infix,echo,17,"['NetEcho_', 'Ropechoborra', 'hechoensonora', 'hechoensonora_', 'homechooled']",False
+infix,vesa,17,"['DriveSavers', 'convesatyion', 'drivesavers', 'uvesafb', 'xvesaforce']",False
+infix,local,17,"['ACLOCAL_AMFLAGS', 'ACLOCAL_FLAGS', 'chroot_local_user', 'setlocale', 'yourlocalbox']",False
+infix,login,17,"['AutomaticLoginEnable', 'TimedLoginEnable', 'bloging', 'on_failsafe_login_i_get_the_same_mess', 'reloging']",False
+infix,splash,16,"['S99splashyZ', 'bootsplashes', 'bootsplashy', 'usplash_down', 'usplashes']",False
+infix,nano,16,"['Buonanotte', '_nano_', 'conanoical', 'hernanof', 'therealnanotube']",False
+infix,wlan,16,"['Howland', 'bwlang', 'iwlan0', 'jnewland', 'linux_wlan_lg']",False
+infix,xterm,15,"['LXTerminal', 'extermail', 'extermely', 'exterminator', 'lxterminal']",False
+infix,files,15,"['HISTFILESIZE', 'LogFileSize', '_files_', 'largefiles4', 'search_files_for']",False
+infix,shell,15,"['Freeshells', '_subshell_', 'bshellz', 'freeshells', 'yeshellothere']",False
+infix,idle,14,"['DavidLeeRoth', 'DavidLevin', 'daidlee', 'didley', 'getmystupidlexmarkprintertoworkubuntu']",False
+infix,sudo,14,"['_gksudo_', 'gksudoedit', 'ushimitsudok', 'ushimitsudoki', 'visudoers']",False
+infix,browser,14,"['filebrowsers', 'pagemacarthurhainpyroexcovermissionimbaytonatuhuposswinzipiblemorcoderopicsecomwarlocknegoguilttryptophandircconscienchighwaystarbusinessmonkeywaldencboomslikbrowserezzasunshmockbsdketoneoperatyphoonlittleliessportasjivemagnasinbadwalflowcharfieldluteninrobocwinnt3', 'webbrowser0', 'webbrowsers', 'webbrowsert']",False
+infix,evolution,14,"['Revolutionary', 'revolutionary', 'revolutionized', 'revolutions']",False
+infix,lamp,13,"['Amberlamps123', 'cclampblues', 'jupiterlamps', 'mr_lampe', 'slampp']",False
+infix,monitor,13,"['ConnectedMonitors', 'SecondMonitorHorizSync', 'allmonitors', 'dualmonitors', 'multimonitoring']",False
+infix,ppas,12,"['lppasswd', 'sraeppasid', 'startuppass', 'webldappasswd', 'yppasswd']",False
+infix,display,12,"['UseDisplayDevice', 'X11DisplayOffset', 'libdisplaymigration0', 'usedisplaydevice', 'xdisplayname']",False
+infix,windows,12,"['connectwindowssharedfolder', 'fake_windows_partition', 'maybethewindowsshellisbroken', 'thewindowsdisk', 'ubunturemovesthepartitionsdeletingwindowsandthenwontcreatenewpartitions']",False
+infix,logs,11,"['blogsite', 'blogspam', 'blogspot', 'fabmashkurdotblogspotdotcom', 'kcatalogsetup']",False
+infix,paste,11,"['copypasted', 'copypaster', 'copypastes', 'doublepasted', 'repasted']",False
+infix,lsof,11,"['Hellsoftrenovati', 'alcoholsoft', 'manlivebrazilwingerpromisethemoonsofticeicekeywarratmnetgrisofticeicekeywarratmnetgriecomillivanillimwarezcsandjanipanambeanablindfaithbitterpillsofticeicekeywaidechainpyrexcovermissionimbaytonatuhuposswinzipiblemorcoderopicsecomwarrratmnetgriecomillivanillimwarezcsandjanipanambeanablindfaithbitterpillecomillivanillimwarezcsandjanipanambeanablindfaithbitterpilltrisfineybrayinstormwatchouwebsi', 'medejavulerduperxmenrainmanlivebrazilwingerpromisethemoonsofticeicekeywarratmnetgrisofticeicekeywarratmnetgriecomillivanillimwarezcsandjanipanambeanablindfaithbitterpillsofticeicekeywaidechainpyrexcovermissionimbaytonatuhuposswinzipiblemorcoderopicsecomwarrratmnetgriecomillivanillimwarezcsandjanipanambeanablindfaithbitterpillecomillivanillimwarezcsandjanipanambeanablindfaithbitterpilltrisfine', 'nullsoft']",False
+infix,desktop,11,"['3ddesktoppackage', 'XDG_DESKTOP_DIR', 'kdesktoprc', 'multidesktops', 'xdesktopwaves']",False
+infix,computer,11,"['HostComputerName', 'IgnorantOfComputerStuff', 'mycomputerisfreakingtryingtobiteoffmyheadhelpmenoweveryone', 'supercomputers', 'yourcomputername']",False
+infix,kernel,10,"['__kernel_vsyscall', 'icanhaskernel2', 'microkernels', 'removeOldKernels', 'set_kernel_font']",False
+infix,window,10,"['XGetWindowProperty', 'avantwindowmanager', 'own_window_hints', 'own_window_type', 'tcp_window_scaling']",False
+infix,ctrl,10,"['altctrlf1', 'correctrly', 'exactrly', 'remoteCTRL1', 'remotectrl1']",False
+infix,volume,10,"['KEY_VOLUMEUP', 'Kvolumewhateverthing', 'libvolumeid0', 'subvolumes', 'udev_volume_id']",False
+infix,copy,9,"['GLX_MESA_copy_sub_buffer', 'GL_NV_copy_depth_to_color', 'acopycat', 'dorkswhocopypaste', 'socannocopypaste']",False
+infix,graphic,9,"['SciGraphica', 'cryptographically', 'geographical', 'geographically', 'pornographical']",False
+infix,wireless,9,"['Comparison_of_open_source_wireless_drivers', 'kwirelessmonitor', 'supportbroadcomwirelesschipsets', 'yourWirelessName', 'your_wireless_card_sux']",False
+infix,xmms,9,['gxmms2'],False
+infix,processor,8,"['2processors', 'acpi_processor_register_performance', 'coprocessors', 'multiprocessors', 'mutliprocessors']",False
+infix,password,8,"['MyPasswordSafe', 'PermitEmptyPasswords', 'jpasswordfields', 'mypasswordsafe', 'null_passwords']",False
+infix,quake,8,"['CostaRicanQuaker', 'IOQuake3', 'ioquake3']",False
+infix,address,8,"['ipaddresses', 'ipaddresshere', 'ipaddressofubuntubox', 'ipaddressofyourNFSserversay', 'kaddressbook']",False
+infix,string,7,"['SixStringer', 'Six_String_sense', 'formatstrings', 'string1string2', 'substrings']",False
+infix,channel,7,"['makeachannelname', 'myownchanneltotestscriptin', 'subchannels', 'thenameofthechanneltoseeifitexists', 'yourchannelname']",False
+infix,connection,7,"['IceConnectionNumber', 'VPNconnections', 'directconnections', 'httpConnectionEncryt', 'max_connections']",False
+infix,push,6,"['cpushares', 'epushing', 'puppypusher', 'spushy', 'truthpusher000']",False
+infix,dash,6,"['LogicallyDashing', 'boulderDashClone', 'cdashiel', 'logicallydashing', 'misterdasher']",False
+infix,account,6,"['LookupAccountNameW', 'myaccounthere', 'newaccounts', 'useraccounts', 'youraccountname']",False
+infix,sqlite,6,"['libsqlite0', 'libsqlite3', 'pysqlite2']",False
+infix,system,6,"['Dateisystemtyp', 'anti_system32', 'filsystemet', 'gotosystemadministrationprining', 'ksystemlog']",False
+infix,dhcp,6,"['0dhcpd', 'nodhcpoffers', 'udhcpc', 'udhcpd']",False
+infix,ports,6,"['backportsource', 'blackportsomething', 'list_backportsrepos', 'sportsbabe987', 'sportscar']",False
+infix,resolution,6,"['815resolutions', '915resolutions', 'NoDFPNativeResolutionCheck', '_resolution_', 'fixresolutionhowto']",False
+infix,passwd,6,"['htpasswd2', 'htpasswds']",False
+infix,symlink,6,"['FollowSymLinks', 'FollowSymlinks', 'followsymlinks', 'resymlinking']",False
+infix,speed,6,"['CoastingSpeedThreashold', 'burnspeeds', 'fanspeeds', 'warspeeding']",False
+infix,runs,5,"['Brunsgaard', 'Brunswick', 'crunshbaNg', 'frunstrating', 'ts3client_runscript']",False
+infix,none,5,"['Anonehawk', 'Vinnonet', 'anonever', 'cnonect', 'sixnonep']",False
+infix,terminal,5,"['DpkgTerminalLog', 'IsthereawayIcanembedaterminalsessiononmydesktop', 'ttyterminalthinger', 'vte_terminal_set_opacity', 'yourterminalcommandhere']",False
+infix,output,5,"['DefaultOutputOrder', 'NameOfOutputIsoWithoutExtension', '_output_', 'nameoutputfile']",False
+infix,screensaver,5,"['xscreensaverrc', 'xscreensavers']",False
+infix,wine,5,"['IWineD3DImpl_CheckDeviceMultiSampleType', 'ewwiness', 'winewineinwe', 'wwinedb', 'xwine_']",False
+infix,application,5,"['BootApplications', 'capplications', 'soundapplications', 'startupapplications', 'subapplications']",False
+infix,vista,5,"['DJVistaMan', 'devistated', 'idualbootwithvistabutitworksinvista', 'movistar']",False
+infix,laptop,5,"['HardwareSupportLaptops', 'itsalaptopnoextrakeyboards', 'klaptop_acpi_helper', 'klaptopdaemon']",False
+infix,pull,5,"['capulllossssssss', 'capullo', 'capullosssssssssss']",False
+infix,compiz,5,"['gcompizthemer', 'libcompizconfig', 'libcompizconfig0']",False
+infix,return,4,"['DysonReturns', 'Neohasreturned', 'penreturns', 'thevoidreturns']",False
+infix,squid,4,"['AGan_squiddy', 'Agan_Squiddy', 'Agan_squiddy', 'bsquidwrd']",False
+infix,ext2,4,"['text2html', 'text2speech']",False
+infix,reinstall,4,"['_reinstall_', 'preinstallation', 'preinstalld', 'sreinstalling']",False
+infix,proxy,4,"['SRLProxy_test_2', 'libproxy1', 'mod_proxy_html', 'mod_proxy_loadbalancing']",False
+infix,unity,4,"['communityserver', 'immunitysec', 'notunityu', 'opportunitys']",False
+infix,emacs,4,"['E4emacs4', 'xemacs21']",False
+infix,directory,4,"['allowdirectorylistings', 'anydirectoryhere', 'fileOrDirectoryName', 'subdirectorys']",False
+infix,global,4,"['OpGlobalBlackout', 'register_globals']",False
+infix,installing,4,"['RecoveringUbuntuAfterInstallingWindows', 'recoverubuntuafterinstallingwindows', 'uninstallingprograms']",False
+infix,wget,4,"['gwget2', 'iwgetid']",False
+infix,plugins,4,"['_plugins_', 'nspluginswrapper']",False
+infix,service,4,"['SSH2_MSG_SERVICE_ACCEPT', 'SSH2_MSG_SERVICE_REQUEST', 'pam_service_name', 'xvideoservicethief']",False
+infix,devices,4,"['CONFIG_NETDEVICES_MULTIQEUE', 'CONFIG_NETDEVICES_MULTIQUEUE', 'no_devices_found', 'whateverdevicescalled']",False
+infix,installer,4,"['swsoft_installer_v3', 'whatevertheinstallersnameis']",False
+infix,debian,4,"['libparted0debian1', 'odbcinst1debian1']",False
+infix,filename,4,"['G_FILENAME_ENCODING', 'GetModuleFileNameW', 'whateverthefilenameis', 'yourfilenamerhere']",False
+infix,wiki,4,"['mediawiki1', 'twiking', 'wikiwikiwiki']",False
+infix,result,4,"['100results', 'HoaryPMResults', 'maxresults', 'nonresults']",False
+infix,ntfs,3,"['NeedsNTFSHelp', 'libntfs5', 'your_ntfs_img_file']",False
+infix,feisty,3,"['25433_Ubuntu_feisty_i386', '8_Ubuntu_feisty_i386', 'sfeistydudes']",False
+infix,mobo,3,"['dmobos', 'emoboy', 'samobody']",False
+infix,cannot,3,"['ICannotUseTheSpaceKey', 'iwasupdatinmysystenwenwaspowerfailurenowicannotusespaceandvariousletters']",False
+infix,protocol,3,"['iiprotocolii', 'inet_protocols']",False
+infix,unmount,3,"['afterunmounting', 'ununmountabel', 'uuuunmounted']",False
+infix,username,3,"['ihateusernames', 'insertusernamehere', 'myNewUsernameInIrc']",False
+infix,bios,3,"['netbiosmachinename', 'nobiospnp', 'pnpbioss']",False
+infix,workspace,3,"['num_workspaces', 'number_of_workspaces']",False
+infix,daemon,3,"['_daemon_', 'istherealinuxmousedaemonicangrepdmesgfor', 'undaemonize']",False
+infix,natty,3,['stefg_natty__'],False
+infix,maverick,3,"['JoeMaverickSett', 'joemavericksett']",False
+infix,pulse,3,"['impulsebsd', 'libpulse0']",False
+infix,telnet,3,"['USHARE_TELNET_PORT', 'in_telnetd']",False
+infix,compiler,3,"['decompilers', 'ofcompilers']",False
+infix,keyboard,3,"['hkeyboards', 'itsalaptopnoextrakeyboards', 'thekeyboards']",False
+infix,loopback,3,"['TRUATE_MESERVER_LIST_AFTER_LOOPBACK_ADDRESS', 'eloopbackup']",False
+infix,object,2,"['SharedObjects', 'ShinyObjects']",False
+infix,indicator,2,"['libindicator3', 'windicators']",False
+infix,clone,2,"['mouseclone_', 'virtualclonedrive']",False
+infix,dualboot,2,"['cansomeonehelpmewithdualbooting', 'idualbootwithvistabutitworksinvista']",False
+infix,hostname,2,"['YOURHOSTNAMEHERE', 'yourhostnamehere']",False
+infix,distro,2,"['get_distro_information', 'whydoesubuntucontinuetobethebaneoflinuxdistros']",False
+infix,installed,2,"['get_installed_runtimes', 'notinstalledyetbecauseofissuewithupgrade']",False
+infix,cheese,2,"['Mrcheesenips', 'mrcheesete0']",False
+infix,lags,2,"['apolagsy', 'flagship']",False
+infix,chmod,2,"['BatchMode', 'batchmode']",False
+infix,interface,2,"['QDBusAbstractInterfacePrivate', 'libkontactinterface4']",False
+infix,launcher,2,"['customlaunchers', 'quicklaunchers']",False
+infix,website,2,"['ewebsites', 'qwebsites']",False
+infix,reboot,2,"['14_rebootonly_gcov', 'autoreboots']",False
+infix,packet,2,"['417packets', 'boringpackets']",False
+infix,edgy,2,['0edgy2'],False
+infix,cdrom,2,"['instluxCDROMUbuntu5_10_en', 'instluxCDROMUbuntu6_06english']",False
+infix,azureus,2,"['_pathtoazureus_azureus', 'yourazureusport']",False
+infix,updated,2,['WUpdatedv3'],False
+infix,hardy,2,"['0hardy2_amd64', '6hardy1']",False
+infix,howto,2,"['nooneknowshowtoinstallamarokfromthatrepo', 'sohowtofix']",False
+infix,macbook,2,['NDPMACBOOKPRO'],False
+infix,amarok,2,"['Gamarok__', 'nooneknowshowtoinstallamarokfromthatrepo']",False
+infix,lxde,2,['glxdemo'],False
+infix,broken,2,"['searchBrokenType', 'sorry_my_spacebar_is_broken_on_this_machine']",False
+infix,strace,2,"['distraced', 'nameOfStraceFile']",False
+infix,which,2,['sandwhiches'],False
+infix,automatix,1,['_AUTOMATIX_'],False
+infix,timeline,1,['untimeliness'],False
+infix,filesystem,1,['gtkfilesystemmodel'],False
+infix,graphics,1,['QGraphicsGridLayout'],False
+infix,breezy,1,['newbreezyinstall'],False
+infix,banshee,1,['command_to_have_banshee_play_next_song_here'],False
+infix,installation,1,['deinstallations'],False
+infix,rsync,1,['librsync1'],False
+infix,automate,1,['almostautomated'],False
+infix,overlay,1,['LIBOVERLAY_SCROLLBAR'],False
+infix,mounted,1,['umountedc'],False
+infix,cargo,1,['escargots'],False
+infix,submit,1,['usb_submit_urb'],False
+infix,metacity,1,['libmetacity0'],False
+infix,dependencies,1,['BASE_DEPENDENCIES_CFLAGS'],False
+infix,nautilus,1,['libnautilus2'],False
+infix,ext3,1,['mkext3fs'],False
+infix,running,1,['couldithavesomethingtodowithmerunningvista'],False
+infix,https,1,['cgihttpserver'],False
+infix,totem,1,['libtotem_mozilla'],False
+infix,systems,1,['filsystemstyp'],False
+infix,wubi,1,['PATHTOWUBIFILE'],False
+infix,repository,1,['standartrepositorys'],False
+infix,gtk2,1,['linux_gtk2_x86_no_jre'],False
+infix,docker,1,['kxdockers'],False
+infix,utopic,1,['autopicks'],False
+infix,pidgin,1,['how_to_connect_to_irc_with_pidgin_gaim'],False
+infix,livecd,1,['andidonthaveanylivecds'],False
+infix,export,1,['ImportExportTools'],False
+infix,microsoft,1,['demicrosoftening'],False
+infix,virtualbox,1,['æævirtualboxææ'],False
+infix,udev,1,['uudeview'],False
+infix,hoary,1,['_hoary_'],False
+infix,integrity,1,['CDIntegrityCheck'],False
+infix,automount,1,['GnomeAutoMounting'],False
+infix,cards,1,['Rt2500WirelessCardsHowTo'],False
+infix,nvidia,1,['binarydriversnvidiahowto'],False
+infix,crash,1,['thecrasher'],False
+infix,dmesg,1,['istherealinuxmousedaemonicangrepdmesgfor'],False
+infix,kubuntu,1,['MrKubuntuUser'],False
+infix,array,1,['jarray52'],False
+infix,options,1,['whateveryouroptionsare'],False
+infix,tutorial,1,['Qttutorial1'],False
+infix,gedit,1,['DougEdith'],False
+infix,fglrx,1,['libfglrx_pp'],False
+infix,fstab,1,['halfstable'],False
+infix,memtest,1,['20_memtest86'],False
+infix,ndiswrapper,1,['SetupNdiswrapperHowTo'],False
+infix,64bit,1,['x64bits'],False
+infix,fixes,1,['libxfixes3'],False
+infix,router,1,['myroutereesid'],False
+infix,ext4,1,['CONFIG_EXT4DEV_FS'],False
+infix,firefox,1,['guidtoupgradingtofirefox1'],False

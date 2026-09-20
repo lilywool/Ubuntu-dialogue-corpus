@@ -1,2 +1,5 @@
-*.csv filter=lfs diff=lfs merge=lfs -text
+# Required lexicons, reviewed overlays, and small fixtures must remain ordinary
+# Git files so Databricks Git folders can read them without a Git LFS client.
+# Raw and generated corpus CSVs are excluded separately in .gitignore.
+*.csv text
 *.pkl filter=lfs diff=lfs merge=lfs -text

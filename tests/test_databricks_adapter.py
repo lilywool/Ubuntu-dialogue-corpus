@@ -20,6 +20,22 @@ from pipeline.pipeline import PipelineConfig, run_pipeline
 
 
 class DatabricksAdapterPolicyTests(unittest.TestCase):
+    def test_runtime_csv_inputs_are_not_git_lfs_filtered(self):
+        attributes = Path(".gitattributes").read_text(encoding="utf-8")
+
+        self.assertNotIn("*.csv filter=lfs", attributes)
+        for path in (
+            Path("lexicons_and_templates/sms_slang_emoticons_dictionary_filled.csv"),
+            Path("reviewed_overlays/residual_words_for_classification.csv"),
+            Path("reviewed_overlays/still_unclassified_defaults_to_NONWORD.csv"),
+        ):
+            self.assertFalse(
+                path.read_text(encoding="utf-8").startswith(
+                    "version https://git-lfs.github.com/spec/v1"
+                ),
+                f"{path} must be available to Databricks as ordinary Git content",
+            )
+
     def test_no_key_resolves_to_manual_review(self):
         self.assertEqual(
             residual_stage_policy(use_api=True, api_key=None),
