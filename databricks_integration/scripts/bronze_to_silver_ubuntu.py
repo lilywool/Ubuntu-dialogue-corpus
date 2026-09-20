@@ -24,6 +24,7 @@ from collections import Counter
 from dataclasses import asdict
 from datetime import datetime, timezone
 from typing import Any, Iterable, Mapping
+from uuid import uuid4
 
 import pandas as pd
 
@@ -854,14 +855,22 @@ def _core_iterator(text_col: str, source_text_col: str, columns: list[str]):
 
 def _enrichment_iterator(
     config: PipelineConfig,
-    residual_broadcast,
-    topic_broadcast,
+    residual_payload,
+    topic_payload,
     text_col: str,
     columns: list[str],
 ):
     def transform(iterator: Iterable[pd.DataFrame]):
-        labels = residual_broadcast.value if residual_broadcast is not None else {}
-        topic_model = topic_broadcast.value if topic_broadcast is not None else None
+        labels = (
+            residual_payload.value
+            if hasattr(residual_payload, "value")
+            else residual_payload or {}
+        )
+        topic_model = (
+            topic_payload.value
+            if hasattr(topic_payload, "value")
+            else topic_payload
+        )
         for frame in iterator:
             yield _align_partition_output(
                 transform_enrichment_partition(
@@ -874,6 +883,51 @@ def _enrichment_iterator(
                 columns,
             )
     return transform
+
+
+def _resolve_materialization_mode(mode: str) -> str:
+    """Choose a reusable intermediate strategy compatible with the Spark API."""
+    if mode not in {"auto", "persist", "delta", "none"}:
+        raise ValueError(
+            "materialization_mode must be 'auto', 'persist', 'delta', or 'none'"
+        )
+    if mode != "auto":
+        return mode
+    try:
+        from pyspark.sql.utils import is_remote
+
+        return "delta" if is_remote() else "persist"
+    except (ImportError, TypeError):
+        return "persist"
+
+
+def _qualified_scratch_table(schema: str, stage: str, run_id: str) -> str:
+    """Return a validated managed-table name for serverless intermediates."""
+    parts = str(schema).split(".")
+    if len(parts) not in {1, 2} or any(
+        not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", part) for part in parts
+    ):
+        raise ValueError(
+            "materialization_schema must be a simple schema or catalog.schema name"
+        )
+    if not re.fullmatch(r"[a-f0-9]{32}", run_id):
+        raise ValueError("materialization run_id must be a UUID hex value")
+    return ".".join([*parts, f"_ubuntu_{stage}_{run_id}"])
+
+
+def _drop_managed_table(spark, table: str) -> None:
+    quoted = ".".join(f"`{part}`" for part in table.split("."))
+    spark.sql(f"DROP TABLE IF EXISTS {quoted}")
+
+
+def release_silver_resources(spark, silver_df, metadata: Mapping[str, Any]) -> None:
+    """Release classic cache state or serverless scratch Delta tables."""
+    materialization = dict(metadata.get("materialization") or {})
+    mode = materialization.get("mode")
+    if mode == "persist":
+        silver_df.unpersist()
+    for table in materialization.get("temporary_tables", []):
+        _drop_managed_table(spark, str(table))
 
 
 def validate_silver_spark(
@@ -1116,73 +1170,140 @@ def run_bronze_to_silver_spark(
     repartition_count: int | None = None,
     api_key: str | None = None,
     maximum_residual_vocabulary: int = 500_000,
+    materialization_mode: str = "auto",
+    materialization_schema: str = "workspace.default",
 ) -> tuple[Any, dict[str, Any], dict[str, Any]]:
-    """Execute distributed bronze-to-silver and return a materialized Spark frame."""
+    """Execute distributed bronze-to-silver and return a materialized Spark frame.
+
+    Classic Spark uses persisted DataFrames. Spark Connect/serverless uses
+    managed Delta scratch tables because cache, persist, checkpoint, and
+    ``sparkContext`` broadcasts are unsupported there.
+    """
     cfg = config or PipelineConfig()
     if cfg.parallel:
         cfg = PipelineConfig(**{**asdict(cfg), "parallel": False, "workers": 1})
-    prepared = prepare_bronze_spark(bronze_df)
-    prepared = sample_bronze_spark(
-        prepared, sample_size=cfg.sample_size, seed=cfg.sample_seed
-    )
-    expected_rows = prepared.count()
-    if repartition_count is not None:
-        if repartition_count < 1:
-            raise ValueError("repartition_count must be positive")
-        _SparkSession, _Window, F, _T = _spark_modules()
-        prepared = prepared.repartition(repartition_count, F.col("message_id"))
+    mode = _resolve_materialization_mode(materialization_mode)
+    run_id = uuid4().hex
+    scratch_tables: list[str] = []
+    core = None
+    core_persisted = False
+    try:
+        prepared = prepare_bronze_spark(bronze_df)
+        prepared = sample_bronze_spark(
+            prepared, sample_size=cfg.sample_size, seed=cfg.sample_seed
+        )
+        expected_rows = prepared.count()
+        if repartition_count is not None:
+            if repartition_count < 1:
+                raise ValueError("repartition_count must be positive")
+            _SparkSession, _Window, F, _T = _spark_modules()
+            prepared = prepared.repartition(repartition_count, F.col("message_id"))
 
-    core_schema = _schema_with_features(prepared.schema, cfg, core_only=True)
-    core_columns = [field.name for field in core_schema.fields]
-    core = prepared.mapInPandas(
-        _core_iterator(text_col, source_text_col, core_columns),
-        schema=core_schema,
-    ).persist()
-    core.count()
+        core_schema = _schema_with_features(prepared.schema, cfg, core_only=True)
+        core_columns = [field.name for field in core_schema.fields]
+        core_plan = prepared.mapInPandas(
+            _core_iterator(text_col, source_text_col, core_columns),
+            schema=core_schema,
+        )
+        if mode == "persist":
+            core = core_plan.persist()
+            core_persisted = True
+            core.count()
+        elif mode == "delta":
+            core_table = _qualified_scratch_table(
+                materialization_schema, "core", run_id
+            )
+            scratch_tables.append(core_table)
+            (
+                core_plan.write.format("delta").mode("overwrite")
+                .option("overwriteSchema", "true").saveAsTable(core_table)
+            )
+            core = spark.table(core_table)
+        else:
+            core = core_plan
 
-    resolved_key = (
-        api_key or cfg.api_key or os.getenv("OPENAI_API_KEY")
-        if cfg.residual_policy == "api"
-        else None
-    )
-    labels, residual_metadata = collect_global_residual_labels(
-        core,
-        policy=cfg.residual_policy,
-        api_key=resolved_key,
-        maximum_vocabulary=maximum_residual_vocabulary,
-    )
-    topic_model = fit_global_topic_model_spark(
-        core, config=cfg, residual_labels=labels, text_col=text_col
-    )
-    residual_broadcast = spark.sparkContext.broadcast(labels) if labels else None
-    topic_broadcast = spark.sparkContext.broadcast(topic_model) if topic_model is not None else None
+        resolved_key = (
+            api_key or cfg.api_key or os.getenv("OPENAI_API_KEY")
+            if cfg.residual_policy == "api"
+            else None
+        )
+        labels, residual_metadata = collect_global_residual_labels(
+            core,
+            policy=cfg.residual_policy,
+            api_key=resolved_key,
+            maximum_vocabulary=maximum_residual_vocabulary,
+        )
+        topic_model = fit_global_topic_model_spark(
+            core, config=cfg, residual_labels=labels, text_col=text_col
+        )
+        if mode == "persist":
+            residual_payload = (
+                spark.sparkContext.broadcast(labels) if labels else None
+            )
+            topic_payload = (
+                spark.sparkContext.broadcast(topic_model)
+                if topic_model is not None else None
+            )
+        else:
+            residual_payload = labels or None
+            topic_payload = topic_model
 
-    output_schema = _schema_with_features(core.schema, cfg, core_only=False)
-    output_columns = [field.name for field in output_schema.fields]
-    silver = core.mapInPandas(
-        _enrichment_iterator(
-            cfg, residual_broadcast, topic_broadcast, text_col, output_columns
-        ),
-        schema=output_schema,
-    ).persist()
-    validation = validate_silver_spark(
-        silver, expected_rows=expected_rows, config=cfg, text_col=text_col
-    )
-    core.unpersist()
-    metadata = {
-        "feature_schema_version": FEATURE_SCHEMA_VERSION,
-        "configuration": {
-            key: value for key, value in asdict(cfg).items() if key != "api_key"
-        },
-        "residuals": residual_metadata,
-        "topics": None if topic_model is None else {
-            "labels": topic_model.labels,
-            "fit_rows": topic_model.fit_rows,
-            "random_state": topic_model.random_state,
-        },
-        "model_loading": "once per Python worker via module-level caches",
-    }
-    return silver, validation, metadata
+        output_schema = _schema_with_features(core.schema, cfg, core_only=False)
+        output_columns = [field.name for field in output_schema.fields]
+        silver_plan = core.mapInPandas(
+            _enrichment_iterator(
+                cfg, residual_payload, topic_payload, text_col, output_columns
+            ),
+            schema=output_schema,
+        )
+        if mode == "persist":
+            silver = silver_plan.persist()
+        elif mode == "delta":
+            silver_table = _qualified_scratch_table(
+                materialization_schema, "silver", run_id
+            )
+            scratch_tables.append(silver_table)
+            (
+                silver_plan.write.format("delta").mode("overwrite")
+                .option("overwriteSchema", "true").saveAsTable(silver_table)
+            )
+            silver = spark.table(silver_table)
+        else:
+            silver = silver_plan
+
+        validation = validate_silver_spark(
+            silver, expected_rows=expected_rows, config=cfg, text_col=text_col
+        )
+        if core_persisted:
+            core.unpersist()
+            core_persisted = False
+        if mode == "delta":
+            _drop_managed_table(spark, core_table)
+            scratch_tables.remove(core_table)
+        metadata = {
+            "feature_schema_version": FEATURE_SCHEMA_VERSION,
+            "configuration": {
+                key: value for key, value in asdict(cfg).items() if key != "api_key"
+            },
+            "residuals": residual_metadata,
+            "topics": None if topic_model is None else {
+                "labels": topic_model.labels,
+                "fit_rows": topic_model.fit_rows,
+                "random_state": topic_model.random_state,
+            },
+            "model_loading": "once per Python worker via module-level caches",
+            "materialization": {
+                "mode": mode,
+                "temporary_tables": list(scratch_tables),
+            },
+        }
+        return silver, validation, metadata
+    except Exception:
+        if core_persisted and core is not None:
+            core.unpersist()
+        for table in reversed(scratch_tables):
+            _drop_managed_table(spark, table)
+        raise
 
 
 def write_silver_delta(
@@ -1307,6 +1428,16 @@ def main() -> None:
     parser.add_argument("--emotion-device", type=int)
     parser.add_argument("--emotion-dtype", choices=("float32", "float16", "bfloat16"), default="float32")
     parser.add_argument("--maximum-residual-vocabulary", type=int, default=500_000)
+    parser.add_argument(
+        "--materialization-mode",
+        choices=("auto", "persist", "delta", "none"),
+        default="auto",
+    )
+    parser.add_argument(
+        "--materialization-schema",
+        default="workspace.default",
+        help="managed catalog.schema used for serverless scratch Delta tables",
+    )
     args = parser.parse_args()
 
     SparkSession, _Window, _F, _T = _spark_modules()
@@ -1325,21 +1456,25 @@ def main() -> None:
         repartition_count=args.repartition_count,
         api_key=os.getenv("OPENAI_API_KEY"),
         maximum_residual_vocabulary=args.maximum_residual_vocabulary,
+        materialization_mode=args.materialization_mode,
+        materialization_schema=args.materialization_schema,
     )
-    target = write_silver_delta(
-        silver,
-        output_table=args.output_table,
-        output_delta_path=args.output_delta_path,
-        mode=args.write_mode,
-    )
-    append_silver_audit_delta(
-        spark,
-        audit_table=args.audit_table,
-        output_target=target,
-        validation=validation,
-        metadata=metadata,
-    )
-    silver.unpersist()
+    try:
+        target = write_silver_delta(
+            silver,
+            output_table=args.output_table,
+            output_delta_path=args.output_delta_path,
+            mode=args.write_mode,
+        )
+        append_silver_audit_delta(
+            spark,
+            audit_table=args.audit_table,
+            output_target=target,
+            validation=validation,
+            metadata=metadata,
+        )
+    finally:
+        release_silver_resources(spark, silver, metadata)
     print(json.dumps({"output": target, "validation": validation}, indent=2, default=str))
 
 

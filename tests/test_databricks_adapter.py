@@ -7,6 +7,8 @@ import pandas as pd
 
 from databricks_integration.scripts.bronze_to_silver_ubuntu import (
     _normalize_match_lists,
+    _qualified_scratch_table,
+    _resolve_materialization_mode,
     build_residual_labels_from_counts,
     build_residual_plan,
     expected_feature_columns,
@@ -149,6 +151,19 @@ class DatabricksAdapterPolicyTests(unittest.TestCase):
         self.assertEqual(normalized.at[0, "slang_matches"], [])
         self.assertEqual(normalized.at[0, "glued_matches"][0]["term"], "aptget")
         self.assertEqual(normalized.at[0, "residual_words"], ["please", "help"])
+
+    def test_serverless_delta_materialization_names_are_validated(self):
+        run_id = "a" * 32
+
+        self.assertEqual(_resolve_materialization_mode("delta"), "delta")
+        self.assertEqual(
+            _qualified_scratch_table("workspace.default", "core", run_id),
+            f"workspace.default._ubuntu_core_{run_id}",
+        )
+        with self.assertRaisesRegex(ValueError, "materialization_schema"):
+            _qualified_scratch_table("workspace.bad-name", "core", run_id)
+        with self.assertRaisesRegex(ValueError, "materialization_mode"):
+            _resolve_materialization_mode("cache")
 
 
 if __name__ == "__main__":

@@ -51,6 +51,15 @@ The full message table is never converted to pandas. Complete probability and
 uncertainty columns are retained rather than reducing transformer output to a
 winning label.
 
+Intermediate reuse adapts to the compute API. Classic Spark uses persisted
+DataFrames and broadcast variables. Serverless/Spark Connect uses short-lived
+managed Delta tables plus serialized immutable artifacts because serverless
+does not support DataFrame cache, persist, checkpoint, or `sparkContext`.
+`--materialization-mode auto` selects the appropriate route;
+`--materialization-schema` controls the scratch-table location. Successful and
+failed runs remove their scratch tables, and final-output cleanup is explicit
+for notebook callers through `release_silver_resources`.
+
 Partition-level deterministic checks run inside the pandas stages. Full-job
 validation runs again after Spark recombines the partitions so missing rows,
 duplicate identifiers, collapsed global distributions, invalid probabilities,
