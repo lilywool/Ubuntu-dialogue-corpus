@@ -1,5 +1,10 @@
 # Databricks integration layer
 
+For an exhaustive comparison of local PowerShell CLI arguments and Databricks
+Python-task Parameters JSON—including sampling semantics and JSON-array
+formatting—see
+the designed [Local and Databricks Parameter Guide](../docs/local_and_databricks_parameters.pdf).
+
 This subfolder contains the distributed Databricks implementation of the
 Ubuntu pipeline: Spark-native bronze ingestion and feature preparation, two
 partition-safe `mapInPandas` NLP passes, validated Delta silver output, and

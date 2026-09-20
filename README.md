@@ -51,30 +51,20 @@ them only for the features you intend to run. Nothing requires modifying
 system Python, Conda base, Java, CUDA, drivers, global `PATH`, or another
 repository's environment.
 
-Run a CPU-friendly VADER pipeline:
+Choose the run according to its purpose:
 
-```powershell
-.\.venv\python.exe -m pipeline.pipeline data\dialogueText_196.csv `
-  --parallel off --sentiment vader --residual-policy manual_review
-```
-
-Or run expensive features on a reproducible sample:
-
-```powershell
-.\.venv\python.exe -m pipeline.pipeline data\dialogueText_196.csv `
-  --sample-size 10000 --sample-seed 42 --parallel auto `
-  --sentiment both --residual-policy reviewed `
-  --advanced-nlp --topics nmf --emotion transformer
-```
-
-| Choice | Supported options |
+| Goal | Pipeline shape |
 |---|---|
-| Local execution | Automatic, forced, or disabled multiprocessing; optional worker count |
-| Input | Full corpus or seeded sample |
-| Residual handling | Manual review, committed reviewed overlay, or opt-in API |
-| Sentiment | None, VADER, RoBERTa, or both |
-| Advanced NLP | spaCy features, global NMF topics, transformer emotion |
-| Precision | Explicit float32, float16, or bfloat16; GPU detection never silently selects fp16 |
+| Validate the setup quickly | Use a small seeded message sample, CPU sentiment, and the lightest NLP path. |
+| Reproduce the reviewed Silver dataset | Apply the committed human-reviewed overlay with deterministic sentiment and parallel local or Spark execution. |
+| Explore richer language features | Add spaCy summaries, global topics, or transformer emotion features. |
+| Run transformer analysis | Use a reproducible sample or suitable GPU compute for transformer sentiment and/or emotion. |
+| Expand residual review | Export unresolved terms for manual review or opt into API-assisted candidate labels. |
+| Build analytical outputs | Aggregate Silver into conversation, user, time, channel, release, or NLP-focused Gold tables. |
+
+The designed [Local and Databricks Parameter Guide](docs/local_and_databricks_parameters.pdf)
+provides the exact PowerShell commands, Databricks Jobs JSON, sampling
+controls, OpenAI-key setup, defaults, and complete parameter crosswalk.
 
 Generated silver data, review files, model artifacts, dashboard data, and
 append-only audit logs stay under the ignored `outputs/` directory.
@@ -176,14 +166,9 @@ provenance, validation, and numeric-token preservation. The same classifier is
 used by the Databricks adapter, although its secret-backed execution remains to
 be verified in a Databricks job.
 
-```text
-python -m databricks_integration.scripts.bronze_to_silver_ubuntu \
-  --input-table catalog.schema.bronze_ubuntu_dialogue \
-  --output-table catalog.schema.silver_ubuntu_dialogue \
-  --audit-table catalog.schema.pipeline_audit \
-  --run-metrics-table catalog.schema.ubuntu_pipeline_run_metrics \
-  --residual-policy reviewed --sentiment vader
-```
+Exact Databricks task setup and Parameters JSON are kept in the
+[Local and Databricks Parameter Guide](docs/local_and_databricks_parameters.pdf)
+so this overview remains purpose-driven rather than tied to one configuration.
 
 Partition transformations have deterministic local parity coverage. Live
 Bronze ingestion, reviewed/VADER Silver processing, conversation-level Gold
@@ -201,6 +186,7 @@ full execution contract.
 - `reviewed_overlays/` — human normalization and residual decisions
 - `notebooks/` — complete twelve-step analysis
 - `databricks_integration/` — distributed Spark/Delta jobs
+- `docs/` — designed project reference guides
 - `dashboard/` — Streamlit application
 - `tests/` — regression, parity, notebook, aggregation, and dashboard tests
 
