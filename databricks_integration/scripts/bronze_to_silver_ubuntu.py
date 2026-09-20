@@ -32,10 +32,35 @@ from uuid import uuid4
 
 import pandas as pd
 
-# Python-script job tasks execute this file directly rather than with
-# ``python -m``. Add only this repository's root so the canonical project
-# packages resolve identically from a Git checkout or workspace Git folder.
-_REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+# Workspace Python-script tasks are executed through ``exec`` and expose the
+# absolute path as ``filename`` rather than ``__file__``. Normal Python uses
+# ``__file__``. Resolve either form without changing global ``PYTHONPATH``.
+def _resolve_repository_root(
+    script_file: str | None,
+    execution_filename: str | None,
+) -> Path:
+    for raw_path in (script_file, execution_filename):
+        if not raw_path:
+            continue
+        resolved = Path(raw_path).resolve()
+        for parent in resolved.parents:
+            if (parent / "pipeline").is_dir() and (
+                parent / "databricks_integration"
+            ).is_dir():
+                return parent
+    current = Path.cwd().resolve()
+    for parent in (current, *current.parents):
+        if (parent / "pipeline").is_dir() and (
+            parent / "databricks_integration"
+        ).is_dir():
+            return parent
+    raise RuntimeError("could not locate the Ubuntu dialogue repository root")
+
+
+_REPOSITORY_ROOT = _resolve_repository_root(
+    globals().get("__file__"),
+    locals().get("filename"),
+)
 if str(_REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPOSITORY_ROOT))
 

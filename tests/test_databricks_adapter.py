@@ -7,6 +7,8 @@ from tempfile import TemporaryDirectory
 import numpy as np
 import pandas as pd
 
+from databricks_integration.scripts import bronze_to_silver_ubuntu as bronze_job
+from databricks_integration.scripts import silver_to_gold_ubuntu as gold_job
 from databricks_integration.scripts.bronze_to_silver_ubuntu import (
     _enrichment_iterator,
     _normalize_match_lists,
@@ -23,6 +25,13 @@ from pipeline.pipeline import PipelineConfig, run_pipeline
 
 
 class DatabricksAdapterPolicyTests(unittest.TestCase):
+    def test_job_scripts_resolve_databricks_exec_filename_without_dunder_file(self):
+        repository_root = Path(__file__).resolve().parents[1]
+        for module in (bronze_job, gold_job):
+            script_path = Path(module.__file__).resolve()
+            resolved = module._resolve_repository_root(None, str(script_path))
+            self.assertEqual(resolved, repository_root)
+
     def test_serialized_enrichment_callable_contains_no_api_key(self):
         secret = "sk-fixture-secret-that-must-stay-on-the-driver"
         transform = _enrichment_iterator(
