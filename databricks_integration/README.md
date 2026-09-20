@@ -60,7 +60,8 @@ does not support DataFrame cache, persist, checkpoint, or `sparkContext`.
 `--materialization-mode auto` selects the appropriate route;
 `--materialization-schema` controls the scratch-table location. Successful and
 failed runs remove their scratch tables, and final-output cleanup is explicit
-for notebook callers through `release_silver_resources`.
+for notebook callers through `release_silver_resources` and
+`release_gold_resources`.
 
 Partition-level deterministic checks run inside the pandas stages. Full-job
 validation runs again after Spark recombines the partitions so missing rows,
@@ -110,6 +111,39 @@ Asset Bundle configuration remains optional deployment work.
 - `gold_topic_summary`
 - `gold_entity_summary`
 - `pipeline_audit`
+- `ubuntu_pipeline_run_metrics`
+
+## Operational run metrics
+
+Both compute paths record the same stage contract in a Delta table. Timers
+surround Spark actions and materialized writes rather than lazy DataFrame-plan
+construction. Bronze-to-silver records `bronze_read`, `core_cleaning`,
+`residual_classification`, optional `topic_model_fit`, `enrichment`,
+`silver_validation`, and `silver_write`. The single `enrichment` stage reflects
+the actual second `mapInPandas` pass, where sentiment and optional advanced NLP
+run together. Silver-to-gold records `silver_read`, `gold_aggregation`,
+`gold_validation`, and `gold_write`.
+
+Each row includes the run/stage identity, input and output rows, duration,
+throughput, per-row latency, sample settings, NLP configuration, compute and
+materialization modes, runtime/cluster identifiers when available, and the
+feature schema version. Configuration fields are allow-listed; API keys are
+never included.
+
+```sql
+SELECT
+  stage,
+  materialization_mode,
+  AVG(duration_seconds) AS avg_duration_seconds,
+  AVG(rows_per_second) AS avg_rows_per_second
+FROM workspace.default.ubuntu_pipeline_run_metrics
+GROUP BY stage, materialization_mode
+ORDER BY avg_duration_seconds DESC;
+```
+
+Use `materialization_mode = 'delta'` for the serverless/Spark Connect route and
+`materialization_mode = 'persist'` for the classic-cluster route selected by
+`auto`. The same Delta table can therefore drive one comparison dashboard.
 
 ## Local silver-to-gold CLI
 
@@ -141,6 +175,7 @@ python -m databricks_integration.scripts.bronze_to_silver_ubuntu \
   --input-table catalog.schema.bronze_ubuntu_dialogue \
   --output-table catalog.schema.silver_ubuntu_dialogue \
   --audit-table catalog.schema.pipeline_audit \
+  --run-metrics-table catalog.schema.ubuntu_pipeline_run_metrics \
   --write-mode overwrite \
   --repartition-count 32 \
   --residual-policy reviewed \
@@ -177,6 +212,7 @@ python -m databricks_integration.scripts.silver_to_gold_ubuntu \
   --input-table catalog.schema.silver_ubuntu_dialogue \
   --output-table catalog.schema.gold_conversation_summary \
   --audit-table catalog.schema.pipeline_audit \
+  --run-metrics-table catalog.schema.ubuntu_pipeline_run_metrics \
   --gold-level conversation
 ```
 

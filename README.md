@@ -152,8 +152,10 @@ worker shape, dependencies, model device, and dtype through the job setup. A
 future Declarative Automation Bundle can record separate serverless and classic
 deployment targets without duplicating the processing code.
 
-Whole-job validation—including the residual `NONWORD` rate—precedes the Delta silver write and audit record. The
-silver-to-gold job then produces any of these grains:
+Whole-job validation—including the residual `NONWORD` rate—precedes the Delta
+silver write and audit record. A shared run-metrics Delta contract records
+materialized stage latency and throughput on both serverless and classic
+compute. The silver-to-gold job then produces any of these grains:
 
 `conversation`, `user`, `date`, `channel`, `release`, `language`,
 `residual`, `technical`, `topic`, `entity`, or seeded `sample`.
@@ -163,13 +165,14 @@ python -m databricks_integration.scripts.bronze_to_silver_ubuntu \
   --input-table catalog.schema.bronze_ubuntu_dialogue \
   --output-table catalog.schema.silver_ubuntu_dialogue \
   --audit-table catalog.schema.pipeline_audit \
+  --run-metrics-table catalog.schema.ubuntu_pipeline_run_metrics \
   --residual-policy reviewed --sentiment vader
 ```
 
 Partition transformations have deterministic local parity coverage. Live
-Bronze ingestion has been verified in Databricks Free Edition; the complete
-Silver/Gold production run remains to be validated on its selected runtime and
-job configuration. See
+Bronze ingestion and a reviewed/VADER Silver smoke test have been verified in
+Databricks Free Edition; the complete Silver/Gold production run remains to be
+validated on its selected runtime and job configuration. See
 [databricks_integration/README.md](databricks_integration/README.md) for the
 full execution contract.
 

@@ -9,8 +9,16 @@ from __future__ import annotations
 import argparse
 import json
 from datetime import datetime, timezone
+from time import perf_counter
 from typing import Any
+from uuid import uuid4
 
+from databricks_integration.run_metrics import (
+    append_run_metrics_delta,
+    append_stage_metric,
+    build_run_metric_context,
+    detect_worker_count,
+)
 from pipeline.aggregation import (
     DATE_GRANULARITIES,
     GOLD_LEVELS,
@@ -345,6 +353,8 @@ def validate_gold_spark(
     release_axis: str = "since",
     sample_size: int | None = None,
     random_state: int = 0,
+    silver_rows: int | None = None,
+    gold_rows: int | None = None,
 ) -> dict[str, Any]:
     """Run global post-aggregation checks before a Delta write."""
     _SparkSession, F, _T = _spark_modules()
@@ -385,8 +395,8 @@ def validate_gold_spark(
         )
         if gold_df.where(invalid).limit(1).count():
             failures.append(f"out-of-range aggregate values in {column}")
-    silver_rows = silver_df.count()
-    gold_rows = gold_df.count()
+    silver_rows = silver_df.count() if silver_rows is None else int(silver_rows)
+    gold_rows = gold_df.count() if gold_rows is None else int(gold_rows)
     if gold_level == "conversation" and "message_count" in gold_df.columns:
         total = gold_df.agg(F.sum("message_count")).first()[0] or 0
         if total != silver_rows:
@@ -428,6 +438,171 @@ def validate_gold_spark(
     return metrics
 
 
+def build_validated_gold_spark(
+    spark,
+    silver_df,
+    *,
+    gold_level: str,
+    date_granularity: str = "day",
+    channel_column: str = "channel",
+    release_axis: str = "since",
+    sample_size: int | None = None,
+    random_state: int = 0,
+    materialization_mode: str = "auto",
+    materialization_schema: str = "workspace.default",
+) -> tuple[Any, dict[str, Any], dict[str, Any]]:
+    """Build, materialize, validate, and time one Spark gold output."""
+    from databricks_integration.scripts.bronze_to_silver_ubuntu import (
+        _drop_managed_table,
+        _qualified_scratch_table,
+        _resolve_materialization_mode,
+    )
+
+    mode = _resolve_materialization_mode(materialization_mode)
+    run_id = uuid4().hex
+    run_metrics: list[dict[str, Any]] = []
+    metrics_context = build_run_metric_context(
+        run_id=run_id,
+        pipeline_layer="silver_to_gold",
+        materialization_mode=mode,
+        gold_level=gold_level,
+        date_granularity=date_granularity,
+        sample_size=sample_size,
+        sample_seed=random_state,
+        worker_count=detect_worker_count(spark),
+    )
+    scratch_tables: list[str] = []
+    gold = None
+    gold_persisted = False
+    try:
+        started = perf_counter()
+        silver_rows = silver_df.count()
+        append_stage_metric(
+            run_metrics,
+            metrics_context,
+            stage="silver_read",
+            duration_seconds=perf_counter() - started,
+            rows_out=silver_rows,
+        )
+
+        started = perf_counter()
+        gold_plan = run_silver_to_gold_spark(
+            silver_df,
+            gold_level=gold_level,
+            date_granularity=date_granularity,
+            channel_column=channel_column,
+            release_axis=release_axis,
+            sample_size=sample_size,
+            random_state=random_state,
+        )
+        if mode == "persist":
+            gold = gold_plan.persist()
+            gold_persisted = True
+            gold_rows = gold.count()
+        elif mode == "delta":
+            gold_table = _qualified_scratch_table(
+                materialization_schema, "gold", run_id
+            )
+            scratch_tables.append(gold_table)
+            (
+                gold_plan.write.format("delta").mode("overwrite")
+                .option("overwriteSchema", "true").saveAsTable(gold_table)
+            )
+            gold = spark.table(gold_table)
+            gold_rows = gold.count()
+        else:
+            gold = gold_plan
+            gold_rows = gold.count()
+        append_stage_metric(
+            run_metrics,
+            metrics_context,
+            stage="gold_aggregation",
+            duration_seconds=perf_counter() - started,
+            rows_in=silver_rows,
+            rows_out=gold_rows,
+        )
+
+        started = perf_counter()
+        validation = validate_gold_spark(
+            silver_df,
+            gold,
+            gold_level=gold_level,
+            channel_column=channel_column,
+            release_axis=release_axis,
+            sample_size=sample_size,
+            random_state=random_state,
+            silver_rows=silver_rows,
+            gold_rows=gold_rows,
+        )
+        append_stage_metric(
+            run_metrics,
+            metrics_context,
+            stage="gold_validation",
+            duration_seconds=perf_counter() - started,
+            rows_in=silver_rows,
+            rows_out=gold_rows,
+        )
+        metadata = {
+            "run_id": run_id,
+            "feature_schema_version": FEATURE_SCHEMA_VERSION,
+            "gold_level": gold_level,
+            "date_granularity": date_granularity,
+            "materialization": {
+                "mode": mode,
+                "temporary_tables": list(scratch_tables),
+            },
+            "run_metrics_context": metrics_context,
+            "run_metrics": run_metrics,
+            "silver_rows": silver_rows,
+            "gold_rows": gold_rows,
+        }
+        return gold, validation, metadata
+    except Exception:
+        if gold_persisted and gold is not None:
+            gold.unpersist()
+        for table in reversed(scratch_tables):
+            _drop_managed_table(spark, table)
+        raise
+
+
+def release_gold_resources(spark, gold_df, metadata: dict[str, Any]) -> None:
+    """Release classic cache state or serverless scratch Delta tables."""
+    from databricks_integration.scripts.bronze_to_silver_ubuntu import (
+        _drop_managed_table,
+    )
+
+    materialization = dict(metadata.get("materialization") or {})
+    if materialization.get("mode") == "persist":
+        gold_df.unpersist()
+    for table in materialization.get("temporary_tables", []):
+        _drop_managed_table(spark, str(table))
+
+
+def write_gold_delta(
+    gold_df,
+    *,
+    output_table: str,
+    mode: str = "overwrite",
+    run_metadata: dict[str, Any] | None = None,
+) -> str:
+    """Write a validated gold table and attach its materialized timing."""
+    started = perf_counter()
+    (
+        gold_df.write.format("delta").mode(mode)
+        .option("overwriteSchema", "true").saveAsTable(output_table)
+    )
+    if run_metadata is not None:
+        append_stage_metric(
+            run_metadata.setdefault("run_metrics", []),
+            run_metadata["run_metrics_context"],
+            stage="gold_write",
+            duration_seconds=perf_counter() - started,
+            rows_in=run_metadata.get("gold_rows"),
+            rows_out=run_metadata.get("gold_rows"),
+        )
+    return output_table
+
+
 def _write_audit_delta(spark, table: str, record: dict[str, Any]) -> None:
     payload = {
         "completed_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -442,6 +617,24 @@ def _write_audit_delta(spark, table: str, record: dict[str, Any]) -> None:
     spark.createDataFrame([payload]).write.format("delta").mode("append").saveAsTable(table)
 
 
+def append_gold_audit_delta(
+    spark,
+    *,
+    audit_table: str,
+    validation: dict[str, Any],
+    metadata: dict[str, Any],
+    metrics_table: str | None = None,
+) -> None:
+    """Append validated gold provenance and optional operational metrics."""
+    _write_audit_delta(spark, audit_table, validation)
+    if metrics_table:
+        append_run_metrics_delta(
+            spark,
+            metrics_table=metrics_table,
+            records=list(metadata.get("run_metrics") or []),
+        )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Build validated Spark/Delta Ubuntu gold tables.")
     source = parser.add_mutually_exclusive_group(required=True)
@@ -449,12 +642,19 @@ def main() -> None:
     source.add_argument("--input-delta-path")
     parser.add_argument("--output-table", required=True)
     parser.add_argument("--audit-table")
+    parser.add_argument("--run-metrics-table")
     parser.add_argument("--gold-level", choices=sorted(GOLD_LEVELS), required=True)
     parser.add_argument("--date-granularity", choices=sorted(DATE_GRANULARITIES), default="day")
     parser.add_argument("--channel-column", default="channel")
     parser.add_argument("--release-axis", choices=sorted(RELEASE_AXES), default="since")
     parser.add_argument("--sample-size", type=int)
     parser.add_argument("--random-state", type=int, default=0)
+    parser.add_argument(
+        "--materialization-mode",
+        choices=("auto", "persist", "delta", "none"),
+        default="auto",
+    )
+    parser.add_argument("--materialization-schema", default="workspace.default")
     args = parser.parse_args()
     SparkSession, _F, _T = _spark_modules()
     spark = SparkSession.builder.getOrCreate()
@@ -463,23 +663,30 @@ def main() -> None:
         if args.input_table
         else spark.read.format("delta").load(args.input_delta_path)
     )
-    gold = run_silver_to_gold_spark(
-        silver, gold_level=args.gold_level,
+    gold, validation, metadata = build_validated_gold_spark(
+        spark, silver, gold_level=args.gold_level,
         date_granularity=args.date_granularity,
         channel_column=args.channel_column, release_axis=args.release_axis,
         sample_size=args.sample_size, random_state=args.random_state,
+        materialization_mode=args.materialization_mode,
+        materialization_schema=args.materialization_schema,
     )
-    validation = validate_gold_spark(
-        silver, gold, gold_level=args.gold_level,
-        channel_column=args.channel_column, release_axis=args.release_axis,
-        sample_size=args.sample_size, random_state=args.random_state,
-    )
-    gold.write.format("delta").mode("overwrite").option(
-        "overwriteSchema", "true"
-    ).saveAsTable(args.output_table)
-    _write_audit_delta(
-        spark, args.audit_table or f"{args.output_table}_audit", validation
-    )
+    try:
+        write_gold_delta(
+            gold,
+            output_table=args.output_table,
+            mode="overwrite",
+            run_metadata=metadata,
+        )
+        append_gold_audit_delta(
+            spark,
+            audit_table=args.audit_table or f"{args.output_table}_audit",
+            validation=validation,
+            metadata=metadata,
+            metrics_table=args.run_metrics_table,
+        )
+    finally:
+        release_gold_resources(spark, gold, metadata)
     print(
         f"wrote Delta table {args.output_table} with {validation['gold_rows']:,} rows"
     )

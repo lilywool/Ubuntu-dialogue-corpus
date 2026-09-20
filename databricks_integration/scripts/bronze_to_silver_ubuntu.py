@@ -24,6 +24,7 @@ from collections import Counter
 from dataclasses import asdict, replace
 from datetime import datetime, timezone
 from functools import partial
+from time import perf_counter
 from typing import Any, Iterable, Mapping
 from uuid import uuid4
 
@@ -32,6 +33,12 @@ import pandas as pd
 from pipeline.pipeline import PipelineConfig, run_pipeline
 from pipeline.schema import FEATURE_SCHEMA_VERSION
 from pipeline.sentiment_analysis import VADER_PROBABILITY_ATOL
+from databricks_integration.run_metrics import (
+    append_run_metrics_delta,
+    append_stage_metric,
+    build_run_metric_context,
+    detect_worker_count,
+)
 
 
 UBUNTU_RELEASE_DATES = (
@@ -1263,21 +1270,39 @@ def run_bronze_to_silver_spark(
         cfg = PipelineConfig(**{**asdict(cfg), "parallel": False, "workers": 1})
     mode = _resolve_materialization_mode(materialization_mode)
     run_id = uuid4().hex
+    run_metrics: list[dict[str, Any]] = []
+    metrics_context = build_run_metric_context(
+        run_id=run_id,
+        pipeline_layer="bronze_to_silver",
+        config=cfg,
+        materialization_mode=mode,
+        spark_partitions=repartition_count,
+        worker_count=detect_worker_count(spark),
+    )
     scratch_tables: list[str] = []
     core = None
     core_persisted = False
     try:
+        started = perf_counter()
         prepared = prepare_bronze_spark(bronze_df)
         prepared = sample_bronze_spark(
             prepared, sample_size=cfg.sample_size, seed=cfg.sample_seed
         )
         expected_rows = prepared.count()
+        append_stage_metric(
+            run_metrics,
+            metrics_context,
+            stage="bronze_read",
+            duration_seconds=perf_counter() - started,
+            rows_out=expected_rows,
+        )
         if repartition_count is not None:
             if repartition_count < 1:
                 raise ValueError("repartition_count must be positive")
             _SparkSession, _Window, F, _T = _spark_modules()
             prepared = prepared.repartition(repartition_count, F.col("message_id"))
 
+        started = perf_counter()
         core_schema = _schema_with_features(prepared.schema, cfg, core_only=True)
         core_columns = [field.name for field in core_schema.fields]
         core_plan = prepared.mapInPandas(
@@ -1300,7 +1325,17 @@ def run_bronze_to_silver_spark(
             core = spark.table(core_table)
         else:
             core = core_plan
+            core.count()
+        append_stage_metric(
+            run_metrics,
+            metrics_context,
+            stage="core_cleaning",
+            duration_seconds=perf_counter() - started,
+            rows_in=expected_rows,
+            rows_out=expected_rows,
+        )
 
+        started = perf_counter()
         resolved_key = (
             api_key or cfg.api_key or os.getenv("OPENAI_API_KEY")
             if cfg.residual_policy == "api"
@@ -1312,9 +1347,27 @@ def run_bronze_to_silver_spark(
             api_key=resolved_key,
             maximum_vocabulary=maximum_residual_vocabulary,
         )
+        append_stage_metric(
+            run_metrics,
+            metrics_context,
+            stage="residual_classification",
+            duration_seconds=perf_counter() - started,
+            rows_in=expected_rows,
+            rows_out=expected_rows,
+        )
+        started = perf_counter()
         topic_model = fit_global_topic_model_spark(
             core, config=cfg, residual_labels=labels, text_col=text_col
         )
+        if cfg.topic_mode == "nmf":
+            append_stage_metric(
+                run_metrics,
+                metrics_context,
+                stage="topic_model_fit",
+                duration_seconds=perf_counter() - started,
+                rows_in=expected_rows,
+                rows_out=expected_rows,
+            )
         if mode == "persist":
             residual_payload = (
                 spark.sparkContext.broadcast(labels) if labels else None
@@ -1327,6 +1380,7 @@ def run_bronze_to_silver_spark(
             residual_payload = labels or None
             topic_payload = topic_model
 
+        started = perf_counter()
         output_schema = _schema_with_features(core.schema, cfg, core_only=False)
         output_columns = [field.name for field in output_schema.fields]
         silver_plan = core.mapInPandas(
@@ -1337,6 +1391,7 @@ def run_bronze_to_silver_spark(
         )
         if mode == "persist":
             silver = silver_plan.persist()
+            silver.count()
         elif mode == "delta":
             silver_table = _qualified_scratch_table(
                 materialization_schema, "silver", run_id
@@ -1349,9 +1404,27 @@ def run_bronze_to_silver_spark(
             silver = spark.table(silver_table)
         else:
             silver = silver_plan
+            silver.count()
+        append_stage_metric(
+            run_metrics,
+            metrics_context,
+            stage="enrichment",
+            duration_seconds=perf_counter() - started,
+            rows_in=expected_rows,
+            rows_out=expected_rows,
+        )
 
+        started = perf_counter()
         validation = validate_silver_spark(
             silver, expected_rows=expected_rows, config=cfg, text_col=text_col
+        )
+        append_stage_metric(
+            run_metrics,
+            metrics_context,
+            stage="silver_validation",
+            duration_seconds=perf_counter() - started,
+            rows_in=expected_rows,
+            rows_out=int(validation["rows"]),
         )
         if core_persisted:
             core.unpersist()
@@ -1360,6 +1433,7 @@ def run_bronze_to_silver_spark(
             _drop_managed_table(spark, core_table)
             scratch_tables.remove(core_table)
         metadata = {
+            "run_id": run_id,
             "feature_schema_version": FEATURE_SCHEMA_VERSION,
             "configuration": {
                 key: value for key, value in asdict(cfg).items() if key != "api_key"
@@ -1375,6 +1449,9 @@ def run_bronze_to_silver_spark(
                 "mode": mode,
                 "temporary_tables": list(scratch_tables),
             },
+            "run_metrics_context": metrics_context,
+            "run_metrics": run_metrics,
+            "selected_rows": expected_rows,
         }
         return silver, validation, metadata
     except Exception:
@@ -1391,16 +1468,29 @@ def write_silver_delta(
     output_table: str | None = None,
     output_delta_path: str | None = None,
     mode: str = "errorifexists",
+    run_metadata: dict[str, Any] | None = None,
 ) -> str:
     """Write one validated silver Delta target."""
     if (output_table is None) == (output_delta_path is None):
         raise ValueError("provide exactly one of output_table or output_delta_path")
+    started = perf_counter()
     writer = silver_df.write.format("delta").mode(mode).option("mergeSchema", "false")
     if output_table:
         writer.saveAsTable(output_table)
-        return output_table
-    writer.save(output_delta_path)
-    return str(output_delta_path)
+        target = output_table
+    else:
+        writer.save(output_delta_path)
+        target = str(output_delta_path)
+    if run_metadata is not None:
+        append_stage_metric(
+            run_metadata.setdefault("run_metrics", []),
+            run_metadata["run_metrics_context"],
+            stage="silver_write",
+            duration_seconds=perf_counter() - started,
+            rows_in=run_metadata.get("selected_rows"),
+            rows_out=run_metadata.get("selected_rows"),
+        )
+    return target
 
 
 def append_silver_audit_delta(
@@ -1410,6 +1500,7 @@ def append_silver_audit_delta(
     output_target: str,
     validation: Mapping[str, Any],
     metadata: Mapping[str, Any],
+    metrics_table: str | None = None,
 ) -> None:
     """Append a secret-free audit row only after validation and Delta write."""
     if not validation.get("passed"):
@@ -1430,6 +1521,12 @@ def append_silver_audit_delta(
     spark.createDataFrame([record]).write.format("delta").mode("append").saveAsTable(
         audit_table
     )
+    if metrics_table:
+        append_run_metrics_delta(
+            spark,
+            metrics_table=metrics_table,
+            records=list(metadata.get("run_metrics") or []),
+        )
 
 
 def _build_config(args) -> PipelineConfig:
@@ -1479,6 +1576,7 @@ def main() -> None:
     destination.add_argument("--output-table")
     destination.add_argument("--output-delta-path")
     parser.add_argument("--audit-table", required=True)
+    parser.add_argument("--run-metrics-table")
     parser.add_argument("--write-mode", choices=("errorifexists", "overwrite", "append"), default="errorifexists")
     parser.add_argument("--repartition-count", type=int)
     parser.add_argument("--sample-size", type=int)
@@ -1546,6 +1644,7 @@ def main() -> None:
             output_table=args.output_table,
             output_delta_path=args.output_delta_path,
             mode=args.write_mode,
+            run_metadata=metadata,
         )
         append_silver_audit_delta(
             spark,
@@ -1553,6 +1652,7 @@ def main() -> None:
             output_target=target,
             validation=validation,
             metadata=metadata,
+            metrics_table=args.run_metrics_table,
         )
     finally:
         release_silver_resources(spark, silver, metadata)
