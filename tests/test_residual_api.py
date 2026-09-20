@@ -17,6 +17,7 @@ from pipeline.residual_stage import (
     DEFAULT_RESIDUAL_CLASSIFIER_MODEL,
     ResidualClassifierError,
     _classify_residual_words_api,
+    apply_api_labels,
     classify_residuals,
     residual_api_provenance,
 )
@@ -174,6 +175,62 @@ class ResidualResponsesAPITests(unittest.TestCase):
             result.attrs["residual_api_provenance"]["classification_status"],
             "candidate_for_human_review",
         )
+
+    def test_digit_only_tokens_are_never_sent_or_replaced(self):
+        captured = {}
+
+        def fake_urlopen(request, timeout):
+            captured["body"] = json.loads(request.data.decode("utf-8"))
+            return _FakeResponse(_response([
+                {"word": "aptfoo", "label": "JARGON"},
+            ]))
+
+        frame = pd.DataFrame({"text_cleaned": ["version 64 aptfoo"]})
+        with patch("pipeline.residual_stage.urllib.request.urlopen", fake_urlopen):
+            result, labels, sources = classify_residuals(
+                frame,
+                Counter({"64": 1, "aptfoo": 1}),
+                policy="api",
+                api_key="sk-test-secret",
+            )
+
+        self.assertEqual(
+            json.loads(captured["body"]["input"]),
+            [{"word": "aptfoo", "count": 1}],
+        )
+        self.assertEqual(labels["64"], "UNCERTAIN")
+        self.assertEqual(sources["64"], "deterministic_numeric")
+        self.assertEqual(result.loc[0, "text_cleaned"], "version 64 aptfoo")
+        provenance = result.attrs["residual_api_provenance"]
+        self.assertEqual(provenance["vocabulary_size"], 2)
+        self.assertEqual(provenance["submitted_vocabulary_size"], 1)
+        self.assertEqual(provenance["deterministic_numeric_passthroughs"], 1)
+
+    def test_apply_api_labels_defensively_preserves_digits(self):
+        frame = pd.DataFrame({"text_cleaned": ["2 or 3 sentences"]})
+
+        result = apply_api_labels(frame, {"2": "NONWORD", "3": "SPANISH"})
+
+        self.assertEqual(result.loc[0, "text_cleaned"], "2 or 3 sentences")
+
+    def test_all_numeric_vocabulary_makes_no_api_request(self):
+        provenance = {}
+        with patch("pipeline.residual_stage.urllib.request.urlopen") as urlopen:
+            labels = _classify_residual_words_api(
+                ["2", "3", "64"],
+                Counter({"2": 1, "3": 1, "64": 1}),
+                api_key="sk-test-secret",
+                provenance=provenance,
+            )
+
+        urlopen.assert_not_called()
+        self.assertEqual(labels, {
+            "2": "UNCERTAIN",
+            "3": "UNCERTAIN",
+            "64": "UNCERTAIN",
+        })
+        self.assertEqual(provenance["submitted_vocabulary_size"], 0)
+        self.assertEqual(provenance["deterministic_numeric_passthroughs"], 3)
 
     def test_databricks_driver_path_uses_same_candidate_contract(self):
         response = _FakeResponse(_response([

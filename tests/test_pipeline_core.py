@@ -160,6 +160,16 @@ class ResidualStageTests(unittest.TestCase):
         self.assertEqual(result.loc[0, "residual_words"], [])
         self.assertEqual(counts, Counter())
 
+    def test_digit_only_tokens_are_not_residual_vocabulary(self):
+        frame = _residual_frame("version 2 or 64 bit with ntfs-3g")
+
+        result, counts = extract_residual_vocabulary(frame)
+
+        self.assertNotIn("2", result.loc[0, "residual_words"])
+        self.assertNotIn("64", result.loc[0, "residual_words"])
+        self.assertNotIn("2", counts)
+        self.assertNotIn("64", counts)
+
     def test_manual_review_policy_does_not_mutate_text(self):
         frame = _residual_frame("mystery")
 

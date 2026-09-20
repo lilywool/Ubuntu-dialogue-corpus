@@ -142,6 +142,7 @@ def _extract_row_candidates(values: tuple) -> list[str]:
         for token in _TOKEN_RE.findall(str(text))
         if token.lower() not in known
         and token.lower() not in _RESERVED_TOKENS_LOWER
+        and not token.isdigit()
     ]
 
 
@@ -208,6 +209,10 @@ def apply_api_labels(
         cursor = 0
         for match in _TOKEN_RE.finditer(text):
             parts.append(text[cursor:match.start()])
+            if match.group(0).isdigit():
+                parts.append(match.group(0))
+                cursor = match.end()
+                continue
             label = normalized.get(match.group(0).lower())
             if label in {None, "JARGON", "UNCERTAIN"}:
                 parts.append(match.group(0))
@@ -313,7 +318,13 @@ def classify_residuals(
     )
     result = apply_api_labels(df, api_labels, text_col=text_col)
     result.attrs["residual_api_provenance"] = provenance
-    return result, api_labels, {word: "api_candidate" for word in api_labels}
+    sources = {
+        word: "deterministic_numeric"
+        if str(word).isdigit()
+        else "api_candidate"
+        for word in api_labels
+    }
+    return result, api_labels, sources
 
 
 def _classify_residual_words_api(
@@ -326,8 +337,12 @@ def _classify_residual_words_api(
 ) -> dict[str, str]:
     """Submit residual tokens in bounded batches and fail on partial output."""
     batch_size = max(1, int(options.pop("batch_size", 500)))
-    words = list(words)
-    labels = {}
+    all_words = list(words)
+    deterministic_labels = {
+        word: "UNCERTAIN" for word in all_words if str(word).isdigit()
+    }
+    words = [word for word in all_words if word not in deterministic_labels]
+    labels = dict(deterministic_labels)
     request_hashes = []
     response_ids = []
     for start in range(0, len(words), batch_size):
@@ -345,7 +360,9 @@ def _classify_residual_words_api(
     if provenance is not None:
         provenance.update(residual_api_provenance(batch_size=batch_size, **options))
         provenance.update({
-            "vocabulary_size": len(words),
+            "vocabulary_size": len(all_words),
+            "submitted_vocabulary_size": len(words),
+            "deterministic_numeric_passthroughs": len(deterministic_labels),
             "batch_count": len(request_hashes),
             "request_sha256": request_hashes,
             "response_ids": response_ids,

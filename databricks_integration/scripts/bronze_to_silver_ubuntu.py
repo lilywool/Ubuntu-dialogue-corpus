@@ -585,7 +585,13 @@ def build_residual_labels_from_counts(
         provenance=api_provenance,
         **dict(api_options or {}),
     )
-    return api_labels, {word: "api_candidate" for word in api_labels}
+    sources = {
+        word: "deterministic_numeric"
+        if str(word).isdigit()
+        else "api_candidate"
+        for word in api_labels
+    }
+    return api_labels, sources
 
 
 def collect_global_residual_labels(
