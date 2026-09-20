@@ -141,6 +141,14 @@ Spark then aggregates the residual vocabulary and fits one bounded global NMF
 model when requested. A second pass applies broadcast labels/topics and runs
 sentiment and optional NLP. Models are cached per Python worker.
 
+The same job adapts to its Databricks compute. In `auto` mode, classic Spark
+reuses intermediates with persisted DataFrames and broadcast variables;
+serverless/Spark Connect instead uses short-lived managed Delta tables and
+serialized immutable artifacts. Databricks still selects the CPU/GPU runtime,
+worker shape, dependencies, model device, and dtype through the job setup. A
+future Declarative Automation Bundle can record separate serverless and classic
+deployment targets without duplicating the processing code.
+
 Whole-job validation precedes the Delta silver write and audit record. The
 silver-to-gold job then produces any of these grains:
 
@@ -155,9 +163,10 @@ python -m databricks_integration.scripts.bronze_to_silver_ubuntu \
   --residual-policy reviewed --sentiment vader
 ```
 
-Partition transformations have deterministic local parity coverage. A live
-Databricks run is not claimed until a workspace, storage target, runtime, and
-worker configuration are selected. See
+Partition transformations have deterministic local parity coverage. Live
+Bronze ingestion has been verified in Databricks Free Edition; the complete
+Silver/Gold production run remains to be validated on its selected runtime and
+job configuration. See
 [databricks_integration/README.md](databricks_integration/README.md) for the
 full execution contract.
 
