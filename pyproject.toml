@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=75,<84"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ubuntu-dialogue-pipeline"
+version = "0.1.0"
+description = "Validated local and Databricks NLP pipeline for the Ubuntu Dialogue Corpus"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = { file = "LICENSE" }
+dependencies = [
+    "pyspellchecker==0.8.3",
+    "tqdm==4.67.1",
+    "vaderSentiment==3.3.2",
+]
+
+[tool.setuptools.packages.find]
+include = [
+    "databricks_integration*",
+    "lexicons_and_templates*",
+    "pipeline*",
+    "reviewed_overlays*",
+]
+
+[tool.setuptools.package-data]
+lexicons_and_templates = ["sms_slang_emoticons_dictionary_filled.csv"]
+reviewed_overlays = ["still_unclassified_defaults_to_NONWORD.csv"]

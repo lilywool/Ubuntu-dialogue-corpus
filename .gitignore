@@ -1,6 +1,8 @@
 # byte-compiled / cache
 __pycache__/
 *.pyc
+build/
+*.egg-info/
 .venv/
 .venv-*/
 .env

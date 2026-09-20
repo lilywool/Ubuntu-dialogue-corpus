@@ -202,6 +202,21 @@ replacing Spark's own PySpark installation. CPU-only PyTorch wheels from
 `requirements-transformer.txt` are for the repository-local Windows
 environment; do not install that CPU wheel on a GPU Databricks cluster.
 
+For a serverless Python-script task, add the repository root (the directory
+containing `pyproject.toml`) as a Jobs environment dependency, for example:
+
+```text
+/Workspace/Users/<user>/Ubuntu-dialogue-corpus
+```
+
+This installs the canonical `pipeline`, `lexicons_and_templates`,
+`reviewed_overlays`, and `databricks_integration` packages on both the driver
+and the isolated `mapInPandas` workers. Pointing the task only at the entry
+script is insufficient because Workspace source files are not automatically
+added to each Python worker's import path. The project package includes the
+two CSV assets required at runtime; raw corpus files and generated outputs are
+not packaged.
+
 ## Databricks Spark/Delta silver-to-gold job
 
 Run the Databricks entry point as a job against either a Unity Catalog table or
