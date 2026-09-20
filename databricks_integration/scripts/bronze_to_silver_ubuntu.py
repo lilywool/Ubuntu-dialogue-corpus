@@ -1028,8 +1028,8 @@ def validate_silver_spark(
             total.isNotNull()
             & (
                 (F.abs(total - F.lit(1.0)) > F.lit(1e-5))
-                | F.greatest(*[F.col(column) for column in probability_columns]) > 1
-                | F.least(*[F.col(column) for column in probability_columns]) < 0
+                | (F.greatest(*[F.col(column) for column in probability_columns]) > 1)
+                | (F.least(*[F.col(column) for column in probability_columns]) < 0)
             )
         ).limit(1).count()
         if invalid:
@@ -1059,8 +1059,8 @@ def validate_silver_spark(
             total.isNotNull()
             & (
                 (F.abs(total - F.lit(1.0)) > F.lit(1e-5))
-                | F.greatest(*[F.col(column) for column in probability_columns]) > 1
-                | F.least(*[F.col(column) for column in probability_columns]) < 0
+                | (F.greatest(*[F.col(column) for column in probability_columns]) > 1)
+                | (F.least(*[F.col(column) for column in probability_columns]) < 0)
             )
         ).limit(1).count()
         if invalid:
@@ -1118,8 +1118,8 @@ def validate_silver_spark(
             emotion_total.isNotNull()
             & (
                 (F.abs(emotion_total - F.lit(1.0)) > F.lit(1e-5))
-                | F.greatest(*[F.col(column) for column in emotion_columns]) > 1
-                | F.least(*[F.col(column) for column in emotion_columns]) < 0
+                | (F.greatest(*[F.col(column) for column in emotion_columns]) > 1)
+                | (F.least(*[F.col(column) for column in emotion_columns]) < 0)
             )
         ).limit(1).count()
         if invalid:

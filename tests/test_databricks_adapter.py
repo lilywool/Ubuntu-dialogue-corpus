@@ -1,3 +1,4 @@
+import ast
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -73,6 +74,22 @@ class DatabricksAdapterPolicyTests(unittest.TestCase):
         self.assertIn('write.format("delta")', source)
         self.assertIn("validate_silver_spark", source)
         self.assertNotIn("bronze_df.toPandas()", source)
+
+    def test_spark_job_avoids_python_chained_comparisons(self):
+        source = Path(
+            "databricks_integration/scripts/bronze_to_silver_ubuntu.py"
+        ).read_text(encoding="utf-8")
+        chained = [
+            node.lineno
+            for node in ast.walk(ast.parse(source))
+            if isinstance(node, ast.Compare) and len(node.ops) > 1
+        ]
+
+        self.assertEqual(
+            chained,
+            [],
+            "Spark Column comparisons must use individually parenthesized &/| clauses",
+        )
 
     def test_partition_functions_match_local_vader_pipeline(self):
         frame = pd.DataFrame({
