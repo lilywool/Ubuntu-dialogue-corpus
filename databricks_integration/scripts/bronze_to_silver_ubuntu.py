@@ -30,6 +30,7 @@ import pandas as pd
 
 from pipeline.pipeline import PipelineConfig, run_pipeline
 from pipeline.schema import FEATURE_SCHEMA_VERSION
+from pipeline.sentiment_analysis import VADER_PROBABILITY_ATOL
 
 
 UBUNTU_RELEASE_DATES = (
@@ -1027,7 +1028,7 @@ def validate_silver_spark(
         invalid = silver_df.where(
             total.isNotNull()
             & (
-                (F.abs(total - F.lit(1.0)) > F.lit(1e-5))
+                (F.abs(total - F.lit(1.0)) > F.lit(VADER_PROBABILITY_ATOL))
                 | (F.greatest(*[F.col(column) for column in probability_columns]) > 1)
                 | (F.least(*[F.col(column) for column in probability_columns]) < 0)
             )

@@ -45,6 +45,7 @@ _ALPHA_RE = re.compile(r"[^\W\d_]")
 DEFAULT_TRANSFORMER_MODEL = "cardiffnlp/twitter-roberta-base-sentiment-latest"
 DEFAULT_TRANSFORMER_REVISION = "3216a57f2a0d9c45a2e6c20157c20c49fb4bf9c7"
 SENTIMENT_LABELS = ("NEGATIVE", "NEUTRAL", "POSITIVE")
+VADER_PROBABILITY_ATOL = 0.002
 VADER_COLUMNS = (
     "vader_negative", "vader_neutral", "vader_positive",
     "vader_compound", "vader_label",
@@ -372,7 +373,10 @@ def validate_sentiment(
                 if ((values < 0) | (values > 1) | ~np.isfinite(values)).any():
                     failures.append("VADER probabilities contain invalid values")
                 # vaderSentiment exposes its proportions rounded to 3 decimals.
-                if not np.allclose(values.sum(axis=1), 1.0, atol=0.002, rtol=0.0):
+                if not np.allclose(
+                    values.sum(axis=1), 1.0,
+                    atol=VADER_PROBABILITY_ATOL, rtol=0.0,
+                ):
                     failures.append("VADER probabilities do not sum to 1")
                 compounds = scored["vader_compound"].to_numpy(dtype=float)
                 if ((compounds < -1) | (compounds > 1) | ~np.isfinite(compounds)).any():

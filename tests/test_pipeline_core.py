@@ -18,6 +18,7 @@ from pipeline.residual_stage import (
 from pipeline.audit import append_run_audit
 from pipeline.sentiment_analysis import (
     SENTIMENT_GENERATED_COLUMNS,
+    VADER_PROBABILITY_ATOL,
     _features_from_pipeline_result,
     analyze_sentiment,
     score_transformer_series,
@@ -143,6 +144,19 @@ class ParallelExecutionTests(unittest.TestCase):
 
 
 class SentimentTests(unittest.TestCase):
+    def test_vader_validation_accepts_documented_rounding_error(self):
+        frame = pd.DataFrame({
+            "text_cleaned": ["ordinary message"],
+            "vader_negative": [0.333],
+            "vader_neutral": [0.333],
+            "vader_positive": [0.335],
+            "vader_compound": [0.0],
+            "vader_label": ["NEUTRAL"],
+        })
+
+        self.assertEqual(VADER_PROBABILITY_ATOL, 0.002)
+        self.assertTrue(validate_sentiment(frame, mode="vader")["passed"])
+
     def test_vader_scores_text_and_skips_placeholder_only_rows(self):
         frame = pd.DataFrame({
             "text_cleaned": ["great fix", "terrible failure", "NONWORD"],
